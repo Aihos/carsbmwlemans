@@ -134,7 +134,7 @@ export default function ConfigurateurComposer({
   const blockTitle = "font-display text-base font-bold uppercase tracking-wide text-ink";
   const optionBox = (active: boolean) =>
     `border transition-all duration-300 ${
-      active ? "border-brand bg-brand/5" : "border-line hover:border-ink/30"
+      active ? "border-ink bg-black/5" : "border-line hover:border-ink/30"
     }`;
 
   return (
@@ -166,7 +166,7 @@ export default function ConfigurateurComposer({
                   aria-pressed={active}
                   className={`shrink-0 border px-3.5 py-2 text-left transition-colors ${
                     active
-                      ? "border-brand bg-brand text-white"
+                      ? "border-ink bg-brand text-white"
                       : "border-line bg-white text-ink hover:border-ink/40"
                   }`}
                 >
@@ -259,7 +259,7 @@ export default function ConfigurateurComposer({
                       title={c.name}
                       className={`aspect-square rounded-full ring-1 transition-all duration-300 ${
                         active
-                          ? "ring-2 ring-brand ring-offset-2 ring-offset-white"
+                          ? "ring-2 ring-ink ring-offset-2 ring-offset-white"
                           : "ring-ink/10 hover:ring-ink/40"
                       }`}
                       style={{ background: c.hex }}
@@ -337,7 +337,7 @@ export default function ConfigurateurComposer({
               </div>
             </div>
 
-            {/* Intérieur — sellerie. Visuels d'exemple du configurateur BMW. */}
+            {/* Intérieur, sellerie. Visuels d'exemple du configurateur BMW. */}
             <div className="border-t border-line pt-3">
               <div className="flex items-baseline justify-between">
                 <h2 className={blockTitle}>Sellerie</h2>
@@ -416,7 +416,7 @@ export default function ConfigurateurComposer({
               </div>
             </div>
 
-            {/* Accessoires — sélection multiple */}
+            {/* Accessoires, sélection multiple */}
             <div className="border-t border-line pt-3">
               <div className="flex items-baseline justify-between">
                 <h2 className={blockTitle}>Accessoires</h2>
@@ -435,7 +435,7 @@ export default function ConfigurateurComposer({
                       type="button"
                       onClick={() => toggleAccessory(a.id)}
                       aria-pressed={active}
-                      title={`${a.name} — ${a.detail}`}
+                      title={`${a.name}, ${a.detail}`}
                       className={`flex items-center gap-2 p-2 text-left ${optionBox(active)}`}
                     >
                       {a.img ? (

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import SmartLink from "./SmartLink";
-import ContactModal from "./ContactModal";
+import { useReservation } from "../lib/reservation";
 import { NAV } from "../data/site";
 
 /* En-tête : roundel BMW, navigation, téléphone, bouton « Réserver ».
@@ -12,7 +12,7 @@ import { NAV } from "../data/site";
    page. */
 export default function Header({ ready }: { ready: boolean }) {
   const [open, setOpen] = useState(false);
-  const [reserve, setReserve] = useState(false);
+  const reservation = useReservation();
   const { pathname } = useLocation();
   const solid = pathname !== "/";
 
@@ -48,7 +48,7 @@ export default function Header({ ready }: { ready: boolean }) {
       } ${solid ? "border-b border-line bg-page/85 backdrop-blur-md" : ""}`}
     >
       <div className="mx-auto flex h-20 max-w-[1700px] items-center justify-between gap-6 px-5 md:h-24 md:px-10">
-        <SmartLink to="/" ariaLabel="Ampère Autopassion — Le Mans" className="shrink-0">
+        <SmartLink to="/" ariaLabel="Ampère Autopassion, Le Mans" className="shrink-0">
           {/* Logo blanc sur la vidéo du hero (accueil), noir sur les pages
               intérieures à fond clair (catalogue, configurateur). */}
           <img
@@ -69,18 +69,18 @@ export default function Header({ ready }: { ready: boolean }) {
           ))}
         </nav>
           <a
-            href="tel:+33649015334"
+            href="tel:+33243850011"
             className={`hidden text-[11px] font-bold uppercase tracking-[0.18em] transition-colors sm:block md:text-sm md:tracking-[0.2em] ${
               onVideo ? "text-white hover:text-white/70" : "text-ink hover:text-brand"
             }`}
           >
-            06 49 01 53 34
+            02 43 85 00 11
           </a>
           <button
             type="button"
             onClick={() => {
               setOpen(false);
-              setReserve(true);
+              reservation?.open();
             }}
             className={`px-5 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors md:px-7 md:py-3 md:text-[11px] ${
               onVideo
@@ -142,18 +142,15 @@ export default function Header({ ready }: { ready: boolean }) {
               ))}
             </ul>
             <a
-              href="tel:+33649015334"
+              href="tel:+33243850011"
               className="mt-5 inline-block text-[11px] font-bold uppercase tracking-[0.2em] text-brand"
             >
-              06 49 01 53 34
+              02 43 85 00 11
             </a>
           </nav>
         </div>
       )}
 
-      {/* Popup de rendez-vous — le formulaire de la page d'accueil, dans la
-          popup du configurateur (même composant ContactModal). */}
-      <ContactModal open={reserve} onClose={() => setReserve(false)} />
     </header>
   );
 }

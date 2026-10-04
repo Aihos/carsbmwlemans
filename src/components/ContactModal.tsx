@@ -24,9 +24,13 @@ type Props = {
   configuration?: string;
   total?: string;
   mensualite?: string;
+  /** Modèle pré-sélectionné dans le formulaire générique (lien « Réserver un
+      essai » d'une carte modèle). Ignoré en mode configuration, qui a déjà
+      son véhicule. */
+  defaultVehicule?: string;
 };
 
-/* Visuel du bandeau — un essai sur la côte, comme la galerie. */
+/* Visuel du bandeau, un essai sur la côte, comme la galerie. */
 const BANNER = "/img/d.webp";
 
 /* Popup de rendez-vous.
@@ -50,6 +54,7 @@ export default function ContactModal({
   configuration,
   total,
   mensualite,
+  defaultVehicule,
 }: Props) {
   const [status, setStatus] = useState<Status>("idle");
   const [feedback, setFeedback] = useState("");
@@ -100,14 +105,14 @@ export default function ContactModal({
         console.error("[/api/reservation]", data.error);
         setStatus("error");
         setFeedback(
-          "L'envoi n'a pas abouti. Merci de réessayer ou de nous appeler au 06 49 01 53 34.",
+          "L'envoi n'a pas abouti. Merci de réessayer ou de nous appeler au 02 43 85 00 11.",
         );
         return;
       }
       setStatus("ok");
     } catch {
       setStatus("error");
-      setFeedback("Connexion impossible. Merci de nous appeler au 06 49 01 53 34.");
+      setFeedback("Connexion impossible. Merci de nous appeler au 02 43 85 00 11.");
     }
   };
 
@@ -180,7 +185,7 @@ export default function ContactModal({
             <div className="md:col-span-2">
               <p className={`${label} text-brand`}>Demande envoyée</p>
               <p className="mt-4 max-w-2xl font-display text-[clamp(1.4rem,2.8vw,2.1rem)] font-black uppercase leading-[1.06] text-ink">
-                Merci — nous nous occupons de la suite.
+                Merci, nous nous occupons de la suite.
               </p>
               <p className="mt-4 max-w-lg text-[13px] leading-relaxed text-ink/60">
                 {configured
@@ -243,9 +248,12 @@ export default function ContactModal({
                     <span className="relative mt-2 block">
                       <select
                         name="vehicule"
-                        defaultValue={VEHICLES[0]}
+                        defaultValue={defaultVehicule ?? VEHICLES[0]}
                         className={`${field} appearance-none pr-6`}
                       >
+                        {defaultVehicule && !VEHICLES.includes(defaultVehicule) && (
+                          <option value={defaultVehicule}>{defaultVehicule}</option>
+                        )}
                         {VEHICLES.map((name) => (
                           <option key={name} value={name}>
                             {name}
@@ -347,7 +355,7 @@ export default function ContactModal({
                 </div>
               </form>
 
-              {/* Colonne de rappel — configuration ou coordonnées */}
+              {/* Colonne de rappel, configuration ou coordonnées */}
               <aside className="border-t border-line pt-8 md:border-l md:border-t-0 md:pl-10 md:pt-0">
                 {configured ? (
                   <>
@@ -400,7 +408,7 @@ export default function ContactModal({
                       <p className={label}>Prix total configuré</p>
                       <p className="mt-1.5 font-display text-3xl font-bold text-ink">{total}</p>
                       <p className="mt-1.5 text-[11px] leading-relaxed text-ink/50">
-                        soit {mensualite} / mois — 48 mois, apport 10 %, hors assurance.
+                        soit {mensualite} / mois, 48 mois, apport 10 %, hors assurance.
                       </p>
                     </div>
                   </>
@@ -412,10 +420,10 @@ export default function ContactModal({
                         <dt className={label}>Téléphone</dt>
                         <dd className="mt-1">
                           <a
-                            href="tel:+336****5334"
+                            href="tel:+33243850011"
                             className="font-display text-xl font-bold text-ink transition-colors hover:text-brand"
                           >
-                            06 49 01 53 34
+                            02 43 85 00 11
                           </a>
                         </dd>
                       </div>
@@ -423,10 +431,10 @@ export default function ContactModal({
                         <dt className={label}>Email</dt>
                         <dd className="mt-1">
                           <a
-                            href="mailto:contact@ampere-autopassion.fr"
+                            href="mailto:contactlemans@amplitude.net.bmw.fr"
                             className="text-[14px] font-semibold text-ink transition-colors hover:text-brand"
                           >
-                            contact@ampere-autopassion.fr
+                            contactlemans@amplitude.net.bmw.fr
                           </a>
                         </dd>
                       </div>

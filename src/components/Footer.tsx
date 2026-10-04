@@ -1,6 +1,5 @@
-import { useState } from "react";
 import SmartLink from "./SmartLink";
-import ContactModal from "./ContactModal";
+import { useReservation } from "../lib/reservation";
 import { ROUNDEL } from "../data/site";
 
 /* Pied de page.
@@ -14,7 +13,13 @@ const TEL_HREF = "tel:+33243850011";
 const MAIL = "contactlemans@amplitude.net.bmw.fr";
 const ADRESSE = "2 boulevard René Cassin, 72016 Le Mans";
 
-const COLS = [
+const HORAIRES = [
+  "Lun-ven : 8h30-12h / 14h-19h",
+  "Samedi : 9h-12h / 14h-18h30",
+  "Dimanche : fermé",
+];
+
+const COLS: { title: string; links: { label: string; to?: string; action?: "contact" }[] }[] = [
   {
     title: "La gamme",
     links: [
@@ -37,20 +42,30 @@ const COLS = [
     title: "Concession",
     links: [
       { label: "Prendre rendez-vous", to: "/#reservation" },
-      { label: "Horaires", to: "/#reservation" },
-      { label: "Nous contacter", to: "/#reservation" },
+      { label: "Horaires", to: "/#horaires" },
+      { label: "Nous contacter", action: "contact" },
       { label: "Retour à l'accueil", to: "/" },
     ],
   },
 ];
 
-/* Liens légaux — repris de la page partenaire BMW. `href` présent = lien
-   externe (nouvel onglet) ; sinon page interne. */
-const LEGAL: { label: string; href?: string }[] = [
+/* Liens légaux repris de la page partenaire BMW de la concession
+   (partenaire.bmw.fr/amplitude-automobiles-le-mans) : ce sont les pages
+   réellement servies de ce côté-là, pas des ancres internes. */
+const LEGAL: { label: string; href: string }[] = [
   { label: "Classes énergétiques", href: "https://www.bmw.fr/fr/gamme-bmw/classes-energetiques-bmw.html" },
-  { label: "Mentions légales" },
-  { label: "Protection des données" },
-  { label: "Cookies" },
+  {
+    label: "Mentions légales",
+    href: "https://partenaire.bmw.fr/amplitude-automobiles-le-mans/mentions-legales",
+  },
+  {
+    label: "Protection des données",
+    href: "https://partenaire.bmw.fr/amplitude-automobiles-le-mans/protection-des-donnees",
+  },
+  {
+    label: "Cookies",
+    href: "https://partenaire.bmw.fr/amplitude-automobiles-le-mans/politique-de-gestion-des-cookies",
+  },
   { label: "Carrières", href: "https://www.reseaubmwrecrute.com/" },
 ];
 
@@ -73,7 +88,7 @@ const SOCIALS = [
 ];
 
 export default function Footer() {
-  const [reserve, setReserve] = useState(false);
+  const reservation = useReservation();
 
   return (
     <footer className="grain relative overflow-hidden bg-ink text-white">
@@ -108,7 +123,7 @@ export default function Footer() {
             </p>
             <button
               type="button"
-              onClick={() => setReserve(true)}
+              onClick={() => reservation?.open()}
               className="mt-5 inline-flex items-center gap-3 bg-brand px-7 py-3.5 text-[11px] uppercase tracking-[0.16em] text-white transition-colors hover:bg-navy"
             >
               Réserver un essai
@@ -131,23 +146,31 @@ export default function Footer() {
             <nav key={c.title} aria-label={c.title}>
               <h2 className="text-[10px] uppercase tracking-[0.2em] text-white/45">{c.title}</h2>
               <ul className="mt-5 space-y-3">
-                {c.links.map((l) => (
-                  <li key={l.label}>
-                    <SmartLink
-                      to={l.to}
-                      className="group inline-flex items-center gap-2 text-[13px] text-white/80 transition-colors hover:text-white"
-                    >
-                      <span className="h-px w-0 bg-white transition-all duration-300 group-hover:w-4" />
-                      {l.label}
-                    </SmartLink>
-                  </li>
-                ))}
+                {c.links.map((l) => {
+                  const cls =
+                    "group inline-flex items-center gap-2 text-[13px] text-white/80 transition-colors hover:text-white";
+                  return (
+                    <li key={l.label}>
+                      {l.action === "contact" ? (
+                        <button type="button" onClick={() => reservation?.open()} className={cls}>
+                          <span className="h-px w-0 bg-white transition-all duration-300 group-hover:w-4" />
+                          {l.label}
+                        </button>
+                      ) : (
+                        <SmartLink to={l.to ?? "/"} className={cls}>
+                          <span className="h-px w-0 bg-white transition-all duration-300 group-hover:w-4" />
+                          {l.label}
+                        </SmartLink>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </nav>
           ))}
 
-          {/* Coordonnées — pas un menu : un bloc d'information */}
-          <div>
+          {/* Coordonnées et horaires (ancre #horaires utilisée par le menu) */}
+          <div id="horaires">
             <h2 className="text-[10px] uppercase tracking-[0.2em] text-white/45">Nous joindre</h2>
             <ul className="mt-5 space-y-3 text-[13px] text-white/80">
               <li>
@@ -161,6 +184,11 @@ export default function Footer() {
                 </a>
               </li>
               <li className="text-white/55">{ADRESSE}</li>
+              {HORAIRES.map((h) => (
+                <li key={h} className="text-white/55">
+                  {h}
+                </li>
+              ))}
             </ul>
           </div>
         </div>
@@ -196,29 +224,19 @@ export default function Footer() {
           <ul className="flex flex-wrap gap-6">
             {LEGAL.map((l) => (
               <li key={l.label}>
-                {l.href ? (
-                  <a
-                    href={l.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="transition-colors hover:text-white"
-                  >
-                    {l.label}
-                  </a>
-                ) : (
-                  <SmartLink to="/" className="transition-colors hover:text-white">
-                    {l.label}
-                  </SmartLink>
-                )}
+                <a
+                  href={l.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="transition-colors hover:text-white"
+                >
+                  {l.label}
+                </a>
               </li>
             ))}
           </ul>
         </div>
       </div>
-
-      {/* Popup de rendez-vous — même composant que l'en-tête et le
-          configurateur, ouverte depuis l'appel à l'action du pied de page. */}
-      <ContactModal open={reserve} onClose={() => setReserve(false)} />
     </footer>
   );
 }

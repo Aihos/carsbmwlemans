@@ -15,28 +15,28 @@ const SHOTS: Shot[] = [
     kicker: "Sportives",
     title: "Essai sur la côte",
     src: "/img/d.webp",
-    alt: "BMW Coupé — essai sur la côte",
+    alt: "BMW Coupé, essai sur la côte",
     to: "/catalogue",
   },
   {
     kicker: "BMW M",
     title: "BMW M2",
     src: "/img/troisquart/BMW-M2-2025-wallpaper.webp",
-    alt: "BMW M2 — sur route",
+    alt: "BMW M2, sur route",
     to: "/catalogue",
   },
   {
     kicker: "BMW i",
     title: "Passer à l'électrique",
     src: "/img/BMW-i5-2024-Side_Profile.17799284.webp",
-    alt: "BMW i5 eDrive40 — profil",
+    alt: "BMW i5 eDrive40, profil",
     to: "/catalogue",
   },
   {
     kicker: "Berline de luxe",
     title: "BMW Série 7",
     src: "/img/troisquart/BMW-7-Series-2027-wallpaper.webp",
-    alt: "BMW Série 7 — essai",
+    alt: "BMW Série 7, essai",
     to: "/catalogue",
   },
 ];
@@ -70,7 +70,7 @@ export default function Gallery() {
           <SmartLink
             key={s.title}
             to={s.to}
-            ariaLabel={`${s.title} — découvrir`}
+            ariaLabel={`${s.title}, découvrir`}
             className="gal-item group relative flex min-h-[280px] flex-col justify-end overflow-hidden bg-ink md:min-h-screen"
           >
             <img

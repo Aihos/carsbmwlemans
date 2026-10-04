@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { gsap, useGSAP, reduced } from "../lib/anim";
 import SmartLink from "./SmartLink";
+import { useReservation } from "../lib/reservation";
 
 /* Hero vidéo plein écran (wireframe 31, d'après la page d'accueil bmw.fr).
    La vidéo est un plan promotionnel BMW (HLS Scene7 converti en MP4) : le hero
@@ -14,6 +15,7 @@ const POSTER = "/video/hero-poster.webp";
 
 export default function Hero({ ready }: { ready: boolean }) {
   const root = useRef<HTMLElement>(null);
+  const reservation = useReservation();
 
   useGSAP(
     () => {
@@ -79,12 +81,13 @@ export default function Hero({ ready }: { ready: boolean }) {
         </h1>
 
         <div className="mt-7 flex flex-wrap items-center justify-center gap-3 md:mt-9">
-          <SmartLink
-            to="/#reservation"
+          <button
+            type="button"
+            onClick={() => reservation?.open()}
             className="hero-cta inline-flex items-center gap-3 bg-white px-7 py-3.5 text-[11px] font-bold tracking-[0.08em] text-ink transition-colors hover:bg-brand hover:text-white md:text-xs"
           >
             Réserver un essai
-          </SmartLink>
+          </button>
           <SmartLink
             to="/catalogue"
             className="hero-cta inline-flex items-center gap-3 border border-white/60 px-7 py-3.5 text-[11px] font-bold tracking-[0.08em] text-white backdrop-blur-[2px] transition-colors hover:bg-white hover:text-ink md:text-xs"

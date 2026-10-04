@@ -76,7 +76,7 @@ export default function Tendances() {
           <span className="hidden shrink-0 font-display text-sm tabular-nums text-ink/40 md:block">
             {String(index + 1).padStart(2, "0")} / {String(CARS.length).padStart(2, "0")}
           </span>
- <div className="flex justify-center b">
+        <div className="flex justify-center">
         <SmartLink
           to="/catalogue"
           className="inline-flex items-center gap-3 border border-line px-8 py-4 text-[11px] uppercase tracking-[0.16em] text-ink transition-colors hover:border-ink"
@@ -115,19 +115,21 @@ export default function Tendances() {
                   )}
                 </div>
 
-                <div className="flex items-end justify-between gap-4 px-5 pt-3">
-                  <div>
-                    <h3 className="font-display text-2xl leading-none text-ink">{c.name}</h3>
-                    <p className="mt-2 text-[11px] text-ink/55">À partir de {EUR2(c.monthly)} / mois</p>
+                <div className="flex flex-1 flex-col px-5 pb-5 pt-4">
+                  <h3 className="min-h-[2.1em] font-display text-2xl leading-[1.05] text-ink">
+                    {c.name}
+                  </h3>
+                  <div className="mt-2 flex items-end justify-between gap-4">
+                    <p className="text-[11px] text-ink/55">À partir de {EUR2(c.monthly)} / mois</p>
+                    <span className="shrink-0 font-display text-[1.35rem] leading-none text-ink">
+                      {EUR(c.price)}
+                    </span>
                   </div>
-                  <span className="shrink-0 font-display text-[1.35rem] leading-none text-ink">
-                    {EUR(c.price)}
-                  </span>
                 </div>
 
                 <SmartLink
                   to={`/?vehicule=${encodeURIComponent(c.name)}#reservation`}
-                  className="mt-5 block bg-ink py-3.5 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-white transition-colors hover:bg-brand"
+                  className="block bg-ink py-3.5 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-white transition-colors hover:bg-brand"
                 >
                   Réserver un essai
                 </SmartLink>

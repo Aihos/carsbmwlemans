@@ -290,7 +290,7 @@ export const EUR2 = (n: number) =>
     maximumFractionDigits: 2,
   }).format(n);
 
-/* Navigation principale — routes réelles (react-router) */
+/* Navigation principale, routes réelles (react-router) */
 export const NAV = [
   { label: "Catalogue", to: "/catalogue" },
   { label: "Configurateur", to: "/configurateur" },
@@ -428,7 +428,7 @@ export type News = {
   id: string;
   /** libellé affiché sur la carte et utilisé comme filtre de la page /actualites */
   category: string;
-  /** date de publication (ISO) — affichée « 03 OCT » sur la page /actualites */
+  /** date de publication (ISO), affichée « 03 OCT » sur la page /actualites */
   date: string;
   title: string;
   excerpt: string;
@@ -449,7 +449,7 @@ export const NEWS: News[] = [
     excerpt:
       "Cinquante exemplaires, un V8 de 625 ch et une silhouette qui cite la 507 de 1957. La Skytop est l'objet le plus exclusif jamais produit par la M. Nous vous accompagnons pour constituer votre dossier.",
     img: "/img/troisquart/BMW-Skytop-2025-Rear_Three-Quarter.60c0a162.webp",
-    alt: "BMW Skytop — trois-quarts arrière",
+    alt: "BMW Skytop, trois-quarts arrière",
     to: "/catalogue",
   },
   {
@@ -460,7 +460,7 @@ export const NEWS: News[] = [
     excerpt:
       "Hybridation, transmission intégrale et plus de 600 ch : le concept qui annonce l'électrification de la gamme M sans renoncer au plaisir de conduire. Les premiers essais presse sont programmés cette saison.",
     img: "/img/troisquart/BMW-Vision_M_Next_Concept-2019-wallpaper.webp",
-    alt: "BMW Vision M Next — concept",
+    alt: "BMW Vision M Next, concept",
     to: "/catalogue",
   },
   {
@@ -471,7 +471,7 @@ export const NEWS: News[] = [
     excerpt:
       "Douze mois de travail, un V8 d'origine reconstruit pièce par pièce et une première sortie sur les routes de la Sarthe. La restauration de la 503 est visible en atelier, sur rendez-vous.",
     img: "/img/BMW-503_Coupe-1956-Side_Profile.83b9c17e.webp",
-    alt: "BMW 503 Coupé 1956 — profil",
+    alt: "BMW 503 Coupé 1956, profil",
     to: "/catalogue",
   },
   {
@@ -482,7 +482,7 @@ export const NEWS: News[] = [
     excerpt:
       "620 km d'autonomie annoncés, recharge à 350 kW et dernière génération de cellules : le iX5 ouvre la voie aux BMW i de demain. Précommandes ouvertes en concession.",
     img: "/img/BMW-iX5-2027-Side_Profile.5ae9ad71.webp",
-    alt: "BMW iX5 — profil",
+    alt: "BMW iX5, profil",
     to: "/catalogue",
   },
   {
@@ -493,7 +493,7 @@ export const NEWS: News[] = [
     excerpt:
       "Six cylindres, suspension pneumatique et banquette arrière façon salon : la Série 7 est exposée en showroom et disponible à l'essai sur rendez-vous.",
     img: "/img/troisquart/BMW-7-Series-2027-wallpaper.webp",
-    alt: "BMW Série 7 — trois-quarts avant",
+    alt: "BMW Série 7, trois-quarts avant",
     to: "/catalogue",
   },
   {
@@ -502,9 +502,9 @@ export const NEWS: News[] = [
     date: "2026-09-12",
     title: "BMW M2 : six cylindres, 480 ch et boîte manuelle au catalogue",
     excerpt:
-      "La M2 reste la plus compacte des BMW M — et la plus joueuse. Notre exemplaire de démonstration est disponible pour un essai encadré sur les routes de la Sarthe.",
+      "La M2 reste la plus compacte des BMW M, et la plus joueuse. Notre exemplaire de démonstration est disponible pour un essai encadré sur les routes de la Sarthe.",
     img: "/img/troisquart/BMW-M2-2025-wallpaper.webp",
-    alt: "BMW M2 — trois-quarts",
+    alt: "BMW M2, trois-quarts",
     to: "/configurateur?modele=m2",
   },
   {
@@ -515,7 +515,7 @@ export const NEWS: News[] = [
     excerpt:
       "Berline électrique, 340 ch et recharge rapide : l'i5 eDrive40 est en essai libre en concession. Une heure au volant suffit à comprendre où va la marque.",
     img: "/img/BMW-i5-2024-Side_Profile.17799284.webp",
-    alt: "BMW i5 eDrive40 — profil",
+    alt: "BMW i5 eDrive40, profil",
     to: "/catalogue",
   },
   {
@@ -526,7 +526,7 @@ export const NEWS: News[] = [
     excerpt:
       "4 200 km au compteur, électrique, toutes options : le iX2 xDrive30 est le compromis le plus malin du moment. Financement et reprise étudiés sur place.",
     img: "/img/BMW-iX2-2024-Side_Profile.e5efc40a.webp",
-    alt: "BMW iX2 xDrive30 — profil",
+    alt: "BMW iX2 xDrive30, profil",
     to: "/catalogue",
   },
   {
@@ -548,7 +548,7 @@ export const NEWS: News[] = [
     excerpt:
       "Châssis carbone, trois cylindres suralimenté et moteur électrique : dix ans après, l'i8 reste la démonstration la plus élégante du savoir-faire BMW i.",
     img: "/img/b%20(2).webp",
-    alt: "BMW i8 — profil",
+    alt: "BMW i8, profil",
     to: "/catalogue",
   },
   {
@@ -559,7 +559,7 @@ export const NEWS: News[] = [
     excerpt:
       "Un V8 atmosphérique, une ligne signée par les ateliers de design et une cote qui ne faiblit pas. Le Z8 est visible sur rendez-vous, entretien complet effectué.",
     img: "/img/A.webp",
-    alt: "BMW Z8 — profil",
+    alt: "BMW Z8, profil",
     to: "/catalogue",
   },
   {
@@ -570,7 +570,7 @@ export const NEWS: News[] = [
     excerpt:
       "Le coupé en finition M Sport, avec ses jantes M et son châssis raffermi, est la porte d'entrée la plus directe vers la grammaire de la gamme M.",
     img: "/img/e.webp",
-    alt: "BMW Série 4 Coupé — profil",
+    alt: "BMW Série 4 Coupé, profil",
     to: "/catalogue",
   },
 ];

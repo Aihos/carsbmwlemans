@@ -34,9 +34,9 @@ Medium / Bold officiels dans `public/fonts/` sous les noms
 `BMWTypeNextPro-{Light,Medium,Bold}.otf`, puis décommenter les blocs `@font-face`
 correspondants dans `src/index.css`. Aucune classe à toucher.
 
-`Inter` ne sert que de repli pendant le chargement du fichier — le retirer de la
-pile `--font-sans` / `--font-display` et supprimer le `<link>` Google Fonts de
-`index.html` si l'on veut couper toute dépendance externe.
+Aucune police distante n'est chargée : la pile `--font-sans` / `--font-display`
+se replie sur Helvetica puis la pile système, et `index.html` ne contient plus
+aucun `<link>` Google Fonts. La typographie n'a donc aucune dépendance externe.
 
 `public/fonts/AgokaFamily.otf` n'est plus référencé (titraille du wireframe
 d'origine, laissée sur le disque pour historique).
