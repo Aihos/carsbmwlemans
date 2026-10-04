@@ -1,0 +1,202 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Typographie — direction artistique BMW
+   BMW Group ne compose pas avec une titraille décorative : tout passe par une
+   seule famille, BMW Type Next Pro — interlettrage quasi nul sur les grands
+   corps, angles vifs, aucune fioriture.
+   Le fichier embarqué est la Regular officielle :
+   public/fonts/BMWTypeNext Pro Regular.otf
+   © Bayerische Motoren Werke AG — police sous licence BMW, non rediffusable.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Un seul fichier fourni (Regular) : on le déclare sur TOUTE la plage de
+   graisses. Le navigateur ne fabrique donc jamais de faux gras — le site
+   entier parle d'une seule voix, ce qui est exactement la règle BMW.
+   Le jour où les Light / Medium / Bold officiels arrivent : les déposer dans
+   /fonts sous les noms ci-dessous et décommenter — ils prendront la main
+   automatiquement sur leur graisse, sans toucher une seule classe. */
+@font-face {
+  font-family: "BMWTypeNext Pro";
+  src: url("/fonts/BMWTypeNext%20Pro%20Regular.otf") format("opentype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+/*
+@font-face {
+  font-family: "BMWTypeNext Pro";
+  src: url("/fonts/BMWTypeNextPro-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "BMWTypeNext Pro";
+  src: url("/fonts/BMWTypeNextPro-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "BMWTypeNext Pro";
+  src: url("/fonts/BMWTypeNextPro-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
+@theme {
+  /* Pile BMW : BMW Type Next Pro (le vrai fichier) → Inter (repli libre pendant
+     le chargement) → pile système. Une seule famille pour tout le site. */
+  --font-sans: "BMWTypeNext Pro", "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-display: "BMWTypeNext Pro", "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+
+  /* Un seul bleu de marque : #00559D */
+  --color-ink: #06213f;
+  --color-navy: #00559d;
+  --color-cobalt: #00559d;
+  --color-brand: #00559d;
+  --color-royal: #00559d;
+  --color-azure: #00559d;
+  --color-page: #ffffff;
+  --color-mist: #f6fafe;
+  --color-line: #c9d9ec;
+}
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+    /* Aucun faux gras ni faux italique fabriqué par le navigateur : la marque
+       n'existe qu'en vraies graisses BMW Type Next Pro. */
+    font-synthesis: none;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-page);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--color-brand);
+    color: #fff;
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  section[id] {
+    scroll-margin-top: 5rem;
+  }
+}
+
+/* Grain / texture papier des aplats bleus (fidélité wireframe) */
+.grain {
+  position: relative;
+  isolation: isolate;
+}
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.28;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+/* Texture de bruit noir & blanc (grain argentique) — anime la trame par pas
+   pour un rendu "film". Se pose au-dessus du motif, sans intercepter la souris. */
+.noise {
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='nz'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23nz)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+  opacity: 0.3;
+  mix-blend-mode: overlay;
+  animation: noise-shift 0.72s steps(1, end) infinite;
+}
+
+@keyframes noise-shift {
+  0% {
+    background-position: 0 0;
+  }
+  20% {
+    background-position: -56px 34px;
+  }
+  40% {
+    background-position: 62px -48px;
+  }
+  60% {
+    background-position: -38px -62px;
+  }
+  80% {
+    background-position: 48px 56px;
+  }
+  100% {
+    background-position: -22px 18px;
+  }
+}
+
+/* Masques de révélation (lignes de texte, visuels).
+   Les titres sont composés en line-height très serrée (0,74 à 1,06) : sans
+   marge interne, un masque calé sur cette hauteur rogne le haut des capitales
+   et des accents. Le padding ouvre la fenêtre de clipping, la marge négative
+   compense pour garder le rythme. */
+.mask-line {
+  display: block;
+  overflow: hidden;
+  padding-top: 0.46em;
+  margin-top: -0.46em;
+}
+.mask-line > span {
+  display: block;
+  will-change: transform;
+}
+
+.watermark {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Anneau de focus accessible et cohérent */
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

@@ -1,0 +1,594 @@
+export type BBox = {
+  /** largeur du fichier source (px) */
+  w: number;
+  /** hauteur du fichier source (px) */
+  h: number;
+  /** première colonne du dessin (marge transparente à gauche) */
+  x0: number;
+  /** première ligne du dessin (haut du sujet) */
+  y0: number;
+  /** dernière ligne du dessin (ligne de sol) */
+  y1: number;
+  /** largeur du dessin utile */
+  bw: number;
+};
+
+export type Car = {
+  id: string;
+  name: string;
+  motorisation: string;
+  price: number;
+  /** mensualité affichée sous le nom (€ / mois) */
+  monthly: number;
+  img: string;
+  tag?: string;
+  /** si présent : le visuel est recadré sur son dessin utile (PNG détouré) */
+  bbox?: BBox;
+};
+
+/* Dessin utile des PNG détourés, mesuré sur leur canal alpha. Il permet de
+   poser les voitures à la même échelle et sur la même ligne de sol, que le
+   fichier ait beaucoup ou peu de vide transparent autour du dessin. */
+export const INTRO_BBOX: Record<string, BBox> = {
+  "/img/intro/1.png": { w: 446, h: 334, x0: 66, y0: 173, y1: 265, bw: 311 },
+  "/img/intro/2.png": { w: 446, h: 334, x0: 52, y0: 167, y1: 259, bw: 343 },
+  "/img/intro/3.png": { w: 446, h: 334, x0: 32, y0: 191, y1: 315, bw: 371 },
+  "/img/intro/4.png": { w: 386, h: 285, x0: 14, y0: 121, y1: 236, bw: 352 },
+  "/img/intro/5.png": { w: 446, h: 334, x0: 25, y0: 132, y1: 252, bw: 386 },
+};
+
+/** Hauteur du dessin utile. */
+export const inkH = (b: BBox) => b.y1 - b.y0 + 1;
+
+/** Rapport d'aspect de la boîte de dessin, à passer à `aspectRatio`. */
+export const inkRatio = (b: BBox) => `${b.bw} / ${inkH(b)}`;
+
+/** Position de l'image dans sa boîte de dessin (le dessin remplit la boîte).
+    `maxWidth: none` est indispensable : la preflight Tailwind (max-width:100%)
+    rognerait l'échelle et décalerait le dessin dans sa boîte. */
+export const inkStyle = (b: BBox) => {
+  const bh = inkH(b);
+  return {
+    left: `${((-b.x0 * 100) / b.bw).toFixed(3)}%`,
+    bottom: `${((-((b.h - 1 - b.y1) * 100)) / bh).toFixed(3)}%`,
+    width: `${((b.w * 100) / b.bw).toFixed(3)}%`,
+    maxWidth: "none",
+  };
+};
+
+export const CARS: Car[] = [
+  {
+    id: "z4",
+    name: "BMW Z4",
+    motorisation: "6 cylindres en ligne · 340 ch",
+    price: 56660,
+    monthly: 752.69,
+    img: "/img/produit/voitureA-net.png",
+    tag: "NEUF · EN STOCK",
+  },
+  {
+    id: "z8",
+    name: "BMW Z8",
+    motorisation: "V8 4,9 L · 400 ch",
+    price: 189500,
+    monthly: 2517.32,
+    img: "/img/intro/1.png",
+    bbox: INTRO_BBOX["/img/intro/1.png"],
+    tag: "BMW CLASSIC",
+  },
+  {
+    id: "i8",
+    name: "BMW i8",
+    motorisation: "Hybride rechargeable · 374 ch",
+    price: 96400,
+    monthly: 1280.58,
+    img: "/img/intro/2.png",
+    bbox: INTRO_BBOX["/img/intro/2.png"],
+    tag: "BMW i",
+  },
+  {
+    id: "e30",
+    name: "BMW 325i",
+    motorisation: "6 cylindres en ligne · 170 ch",
+    price: 34900,
+    monthly: 463.61,
+    img: "/img/intro/3.png",
+    bbox: INTRO_BBOX["/img/intro/3.png"],
+    tag: "BMW CLASSIC",
+  },
+  {
+    id: "m2",
+    name: "BMW M2",
+    motorisation: "6 cylindres en ligne · 480 ch",
+    price: 62400,
+    monthly: 828.92,
+    img: "/img/intro/4.png",
+    bbox: INTRO_BBOX["/img/intro/4.png"],
+    tag: "BMW M",
+  },
+  {
+    id: "m2c",
+    name: "BMW M2 Compétition",
+    motorisation: "6 cylindres en ligne · 510 ch",
+    price: 71200,
+    monthly: 945.82,
+    img: "/img/intro/5.png",
+    bbox: INTRO_BBOX["/img/intro/5.png"],
+    tag: "BMW M",
+  },
+];
+
+export const COLORS = [
+  { id: "silver", name: "Titanium Silver", hex: "#c6cbd1" },
+  { id: "white", name: "Alpine White", hex: "#f1f3f5" },
+  { id: "black", name: "Sapphire Black", hex: "#15171b" },
+  { id: "red", name: "Melbourne Red", hex: "#9c1b26" },
+  { id: "blue", name: "Portimao Blue", hex: "#00559d" },
+  { id: "green", name: "Isle of Man Green", hex: "#17452f" },
+  { id: "frozen", name: "Frozen Grey", hex: "#7d848d" },
+  { id: "brooklyn", name: "Brooklyn Grey", hex: "#98a0a8" },
+];
+
+export type Wheel = { id: string; name: string; tyre: string; size: string; style: string; price: number; spokes: number };
+
+export const WHEELS: Wheel[] = [
+  { id: "w32", name: 'P Zéro 18"', tyre: "Pirelli P Zéro", size: "18\"", style: "Style 32", price: 0, spokes: 5 },
+  { id: "w791", name: 'Pilot Sport 19"', tyre: "Michelin Pilot Sport", size: "19\"", style: "Style 791 M", price: 1450, spokes: 10 },
+  { id: "w963", name: 'Cup 2 20"', tyre: "Pilot Sport Cup 2", size: "20\"", style: "Style 963 M", price: 3200, spokes: 20 },
+  { id: "w796", name: 'Hiver 18"', tyre: "Pneumatique hiver", size: "18\"", style: "Style 796 M", price: 890, spokes: 7 },
+];
+
+export type Engine = { id: string; name: string; label: string; power: string; price: number };
+
+export const ENGINES: Engine[] = [
+  { id: "e48", name: "V8 4,8 L", label: "Sport", power: "367 ch", price: 0 },
+  { id: "e50", name: "V8 5,0 L", label: "M Sport", power: "400 ch", price: 6800 },
+  { id: "e54", name: "V8 5,4 L", label: "M Performance", power: "452 ch", price: 12400 },
+];
+
+export const BASE_PRICE = 56660;
+export const CAR_NAME = "BMW Z4";
+
+/* ─────────────── Intérieur & accessoires (atelier de configuration) ─────────────── */
+
+export type Interior = {
+  id: string;
+  /** famille affichée en petit sur la carte */
+  family: string;
+  name: string;
+  price: number;
+  /** visuel d'exemple repris du configurateur BMW (public/img/configurateur/) */
+  img: string;
+  /** nuance appliquée à ce visuel : le fichier d'exemple est unique */
+  filter?: string;
+};
+
+/* Selleries — visuel d'exemple : « Sellerie Tissu Arktur Anthracite » du
+   configurateur BMW (140 × 140). Les autres teintes déclinent ce même visuel
+   par filtre CSS, en attendant les photos produit définitives. */
+export const SEATS: Interior[] = [
+  {
+    id: "arktur",
+    family: "Tissu",
+    name: "Arktur Anthracite",
+    price: 0,
+    img: "/img/configurateur/sellerie-arktur.webp",
+  },
+  {
+    id: "sensatec",
+    family: "Sensatec",
+    name: "Noir",
+    price: 1200,
+    img: "/img/configurateur/sellerie-arktur.webp",
+    filter: "brightness(1.45) contrast(1.06)",
+  },
+  {
+    id: "vernasca-cognac",
+    family: "Cuir Vernasca",
+    name: "Cognac",
+    price: 2400,
+    img: "/img/configurateur/sellerie-arktur.webp",
+    filter: "brightness(2.3) saturate(1.6) sepia(0.45)",
+  },
+];
+
+/* Inserts décoratifs — visuel d'exemple : « Inserts décoratifs "Quarzsilber"
+   mat grainé » du configurateur BMW. */
+export const TRIMS: Interior[] = [
+  {
+    id: "quarzsilber",
+    family: "Insert",
+    name: "Quarzsilber mat grainé",
+    price: 0,
+    img: "/img/configurateur/insert-quarzsilber.webp",
+  },
+  {
+    id: "alu-mesh",
+    family: "Insert",
+    name: "Aluminium M Mesheffect",
+    price: 250,
+    img: "/img/configurateur/insert-quarzsilber.webp",
+    filter: "brightness(1.2) contrast(1.5) saturate(0.15)",
+  },
+  {
+    id: "bois-noir",
+    family: "Insert",
+    name: "Bois précieux noir brillant",
+    price: 600,
+    img: "/img/configurateur/insert-quarzsilber.webp",
+    filter: "brightness(0.5) sepia(0.55) saturate(2.2)",
+  },
+];
+
+export type AccessoryIconName = "roofbox" | "bars" | "wheels" | "mat" | "hitch";
+
+export type Accessory = {
+  id: string;
+  name: string;
+  detail: string;
+  price: number;
+  icon: AccessoryIconName;
+  /** photo produit, si le client en fournit une (sinon pictogramme) */
+  img?: string;
+};
+
+/* Accessoires — noms et prix relevés sur le configurateur BMW (Coffre de toit
+   BMW Aero 550, Jeu de roues complètes hiver, barres…). Le configurateur
+   n'expose pas de photo produit exploitable pour ces articles : les cartes
+   s'appuient sur un pictogramme. Déposer un visuel dans
+   public/img/configurateur/ et renseigner `img` pour passer en photo. */
+export const ACCESSORIES: Accessory[] = [
+  {
+    id: "coffre-toit",
+    name: "Coffre de toit BMW Aero 550",
+    detail: "460 l · ouvrable des deux côtés",
+    price: 690,
+    icon: "roofbox",
+  },
+  {
+    id: "barres",
+    name: "Barres de toit",
+    detail: "aluminium, verrouillables",
+    price: 250,
+    icon: "bars",
+  },
+  {
+    id: "roues-hiver",
+    name: 'Jeu de roues complètes hiver 18"',
+    detail: "jante BMW + pneumatique hiver",
+    price: 1900,
+    icon: "wheels",
+    img: "/img/configurateur/jante-867.webp",
+  },
+  {
+    id: "tapis",
+    name: "Tapis de sol BMW",
+    detail: "sur mesure, 4 pièces",
+    price: 120,
+    icon: "mat",
+  },
+  {
+    id: "attelage",
+    name: "Attelage électrique escamotable",
+    detail: "déverrouillage électrique",
+    price: 1250,
+    icon: "hitch",
+  },
+];
+
+/** Logo BMW de la concession (roundel) */
+export const ROUNDEL = "/img/logo/BMW.svg";
+
+export const EUR = (n: number) =>
+  new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n);
+
+export const EUR2 = (n: number) =>
+  new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(n);
+
+/* Navigation principale — routes réelles (react-router) */
+export const NAV = [
+  { label: "Catalogue", to: "/catalogue" },
+  { label: "Configurateur", to: "/configurateur" },
+  { label: "Actualités", to: "/actualites" },
+];
+
+/* ─────────────────────────── Catalogue ─────────────────────────── */
+
+export type Family = "BMW M" | "BMW i" | "BMW Classic";
+
+export type CatalogueCar = {
+  id: string;
+  name: string;
+  motorisation: string;
+  energy: string;
+  family: Family;
+  year: number;
+  km: number;
+  gearbox: string;
+  price: number;
+  monthly: number;
+  img: string;
+  bbox?: BBox;
+  tag?: string;
+};
+
+/** Mensualité indicative (60 mois, apport 10 %) — même barème que les
+    modèles déjà chiffrés dans CARS. */
+const financed = (price: number) => Math.round(price * 0.013285 * 100) / 100;
+
+/** Fiche technique des modèles de `CARS` (visuels détourés). */
+const SHEETS: Record<string, Pick<CatalogueCar, "energy" | "family" | "year" | "km" | "gearbox">> = {
+  z4: { energy: "Essence", family: "BMW M", year: 2024, km: 0, gearbox: "Automatique" },
+  z8: { energy: "Essence", family: "BMW Classic", year: 2001, km: 42800, gearbox: "Manuelle" },
+  i8: { energy: "Hybride rechargeable", family: "BMW i", year: 2019, km: 26400, gearbox: "Automatique" },
+  e30: { energy: "Essence", family: "BMW Classic", year: 1990, km: 121000, gearbox: "Manuelle" },
+  m2: { energy: "Essence", family: "BMW M", year: 2023, km: 8600, gearbox: "Automatique" },
+  m2c: { energy: "Essence", family: "BMW M", year: 2024, km: 3100, gearbox: "Automatique" },
+};
+
+/** Arrivages, fonds de stock et électriques (photos trois-quarts / profils). */
+const ARRIVAGES: CatalogueCar[] = [
+  {
+    id: "i5",
+    name: "BMW i5 eDrive40",
+    motorisation: "Électrique · 340 ch · 582 km WLTP",
+    energy: "Électrique",
+    family: "BMW i",
+    year: 2024,
+    km: 0,
+    gearbox: "Automatique",
+    price: 78900,
+    monthly: financed(78900),
+    img: "/img/BMW-i5-2024-Side_Profile.17799284.webp",
+    tag: "NEUF · EN STOCK",
+  },
+  {
+    id: "ix2",
+    name: "BMW iX2 xDrive30",
+    motorisation: "Électrique · 313 ch · 449 km WLTP",
+    energy: "Électrique",
+    family: "BMW i",
+    year: 2024,
+    km: 4200,
+    gearbox: "Automatique",
+    price: 58400,
+    monthly: financed(58400),
+    img: "/img/BMW-iX2-2024-Side_Profile.e5efc40a.webp",
+    tag: "0 KM DÉMONSTRATION",
+  },
+  {
+    id: "ix5",
+    name: "BMW iX5",
+    motorisation: "Électrique · 400 ch · 620 km WLTP",
+    energy: "Électrique",
+    family: "BMW i",
+    year: 2027,
+    km: 0,
+    gearbox: "Automatique",
+    price: 92000,
+    monthly: financed(92000),
+    img: "/img/BMW-iX5-2027-Side_Profile.5ae9ad71.webp",
+    tag: "PRÉCOMMANDE",
+  },
+  {
+    id: "b503",
+    name: "BMW 503 Coupé",
+    motorisation: "V8 3,2 L · 140 ch",
+    energy: "Essence",
+    family: "BMW Classic",
+    year: 1956,
+    km: 68400,
+    gearbox: "Manuelle",
+    price: 148000,
+    monthly: financed(148000),
+    img: "/img/BMW-503_Coupe-1956-Side_Profile.83b9c17e.webp",
+    tag: "BMW CLASSIC",
+  },
+  {
+    id: "b507",
+    name: "BMW 507 Roadster",
+    motorisation: "V8 3,2 L · 150 ch",
+    energy: "Essence",
+    family: "BMW Classic",
+    year: 1957,
+    km: 41200,
+    gearbox: "Manuelle",
+    price: 1450000,
+    monthly: financed(1450000),
+    img: "/img/BMW-507-1956-Side_Profile.18bb170f.webp",
+    tag: "BMW CLASSIC",
+  },
+];
+
+export const CATALOGUE: CatalogueCar[] = [
+  ...CARS.map((c) => ({ ...c, ...SHEETS[c.id] })),
+  ...ARRIVAGES,
+];
+
+export const FAMILIES: Family[] = ["BMW M", "BMW i", "BMW Classic"];
+
+export const SORTS = [
+  { id: "price-asc", label: "Prix croissant" },
+  { id: "price-desc", label: "Prix décroissant" },
+  { id: "year-desc", label: "Année récente" },
+  { id: "km-asc", label: "Kilométrage" },
+];
+
+/** Tous les véhicules proposés dans le formulaire de rendez-vous. */
+export const VEHICLES = Array.from(new Set(CATALOGUE.map((c) => c.name)));
+
+/* ─────────────────────────── Actualités ─────────────────────────── */
+
+export type News = {
+  id: string;
+  /** libellé affiché sur la carte et utilisé comme filtre de la page /actualites */
+  category: string;
+  /** date de publication (ISO) — affichée « 03 OCT » sur la page /actualites */
+  date: string;
+  title: string;
+  excerpt: string;
+  img: string;
+  alt: string;
+  to: string;
+};
+
+/* Actualités — jeu de démonstration, à remplacer par les vraies parutions.
+   Les quatre premières composent le carrousel de la page d'accueil
+   (`NEWS_HIGHLIGHT`), les douze alimentent la page /actualites. */
+export const NEWS: News[] = [
+  {
+    id: "skytop",
+    category: "BMW M",
+    date: "2026-10-03",
+    title: "BMW Skytop, la série limitée la plus rare de la gamme",
+    excerpt:
+      "Cinquante exemplaires, un V8 de 625 ch et une silhouette qui cite la 507 de 1957. La Skytop est l'objet le plus exclusif jamais produit par la M. Nous vous accompagnons pour constituer votre dossier.",
+    img: "/img/troisquart/BMW-Skytop-2025-Rear_Three-Quarter.60c0a162.webp",
+    alt: "BMW Skytop — trois-quarts arrière",
+    to: "/catalogue",
+  },
+  {
+    id: "vision-m-next",
+    category: "Innovation",
+    date: "2026-09-30",
+    title: "Vision M Next : ce que la M prépare pour demain",
+    excerpt:
+      "Hybridation, transmission intégrale et plus de 600 ch : le concept qui annonce l'électrification de la gamme M sans renoncer au plaisir de conduire. Les premiers essais presse sont programmés cette saison.",
+    img: "/img/troisquart/BMW-Vision_M_Next_Concept-2019-wallpaper.webp",
+    alt: "BMW Vision M Next — concept",
+    to: "/catalogue",
+  },
+  {
+    id: "classic-503",
+    category: "BMW Classic",
+    date: "2026-09-26",
+    title: "Nos ateliers remettent en route une 503 Coupé de 1956",
+    excerpt:
+      "Douze mois de travail, un V8 d'origine reconstruit pièce par pièce et une première sortie sur les routes de la Sarthe. La restauration de la 503 est visible en atelier, sur rendez-vous.",
+    img: "/img/BMW-503_Coupe-1956-Side_Profile.83b9c17e.webp",
+    alt: "BMW 503 Coupé 1956 — profil",
+    to: "/catalogue",
+  },
+  {
+    id: "ix5",
+    category: "BMW i",
+    date: "2026-09-22",
+    title: "BMW iX5 : la nouvelle génération électrique se précise",
+    excerpt:
+      "620 km d'autonomie annoncés, recharge à 350 kW et dernière génération de cellules : le iX5 ouvre la voie aux BMW i de demain. Précommandes ouvertes en concession.",
+    img: "/img/BMW-iX5-2027-Side_Profile.5ae9ad71.webp",
+    alt: "BMW iX5 — profil",
+    to: "/catalogue",
+  },
+  {
+    id: "serie7",
+    category: "Gamme",
+    date: "2026-09-18",
+    title: "Série 7 : le vaisseau amiral arrive en concession",
+    excerpt:
+      "Six cylindres, suspension pneumatique et banquette arrière façon salon : la Série 7 est exposée en showroom et disponible à l'essai sur rendez-vous.",
+    img: "/img/troisquart/BMW-7-Series-2027-wallpaper.webp",
+    alt: "BMW Série 7 — trois-quarts avant",
+    to: "/catalogue",
+  },
+  {
+    id: "m2",
+    category: "BMW M",
+    date: "2026-09-12",
+    title: "BMW M2 : six cylindres, 480 ch et boîte manuelle au catalogue",
+    excerpt:
+      "La M2 reste la plus compacte des BMW M — et la plus joueuse. Notre exemplaire de démonstration est disponible pour un essai encadré sur les routes de la Sarthe.",
+    img: "/img/troisquart/BMW-M2-2025-wallpaper.webp",
+    alt: "BMW M2 — trois-quarts",
+    to: "/configurateur?modele=m2",
+  },
+  {
+    id: "news-i5",
+    category: "BMW i",
+    date: "2026-09-08",
+    title: "i5 eDrive40 : 582 km WLTP, l'essai libre est ouvert",
+    excerpt:
+      "Berline électrique, 340 ch et recharge rapide : l'i5 eDrive40 est en essai libre en concession. Une heure au volant suffit à comprendre où va la marque.",
+    img: "/img/BMW-i5-2024-Side_Profile.17799284.webp",
+    alt: "BMW i5 eDrive40 — profil",
+    to: "/catalogue",
+  },
+  {
+    id: "news-ix2",
+    category: "BMW i",
+    date: "2026-09-04",
+    title: "iX2 xDrive30 : un 0 km démonstration rejoint notre stock",
+    excerpt:
+      "4 200 km au compteur, électrique, toutes options : le iX2 xDrive30 est le compromis le plus malin du moment. Financement et reprise étudiés sur place.",
+    img: "/img/BMW-iX2-2024-Side_Profile.e5efc40a.webp",
+    alt: "BMW iX2 xDrive30 — profil",
+    to: "/catalogue",
+  },
+  {
+    id: "news-e30",
+    category: "BMW Classic",
+    date: "2026-08-30",
+    title: "Une 325i cabriolet de 1990 entre en collection",
+    excerpt:
+      "Cent vingt et un mille kilomètres, un six cylindres en ligne et une capote d'origine : cette E30 rejoint les pièces BMW Classic suivies par nos ateliers.",
+    img: "/img/c.webp",
+    alt: "BMW 325i cabriolet de 1990",
+    to: "/catalogue",
+  },
+  {
+    id: "news-i8",
+    category: "Innovation",
+    date: "2026-08-24",
+    title: "BMW i8 : retour sur l'hybride qui a ouvert la voie",
+    excerpt:
+      "Châssis carbone, trois cylindres suralimenté et moteur électrique : dix ans après, l'i8 reste la démonstration la plus élégante du savoir-faire BMW i.",
+    img: "/img/b%20(2).webp",
+    alt: "BMW i8 — profil",
+    to: "/catalogue",
+  },
+  {
+    id: "news-z8",
+    category: "BMW Classic",
+    date: "2026-08-18",
+    title: "Z8 : le roadster qui prolonge la 507 dans notre showroom",
+    excerpt:
+      "Un V8 atmosphérique, une ligne signée par les ateliers de design et une cote qui ne faiblit pas. Le Z8 est visible sur rendez-vous, entretien complet effectué.",
+    img: "/img/A.webp",
+    alt: "BMW Z8 — profil",
+    to: "/catalogue",
+  },
+  {
+    id: "news-serie4",
+    category: "Gamme",
+    date: "2026-08-11",
+    title: "Série 4 Coupé : finition M Sport et jantes M au catalogue",
+    excerpt:
+      "Le coupé en finition M Sport, avec ses jantes M et son châssis raffermi, est la porte d'entrée la plus directe vers la grammaire de la gamme M.",
+    img: "/img/e.webp",
+    alt: "BMW Série 4 Coupé — profil",
+    to: "/catalogue",
+  },
+];
+
+/** Les quatre actualités mises en avant dans le carrousel de la page d'accueil. */
+export const NEWS_HIGHLIGHT: News[] = NEWS.slice(0, 4);
+
+/** Filtres de la page /actualites : « Tout » puis les catégories réellement présentes. */
+export const NEWS_TAGS: string[] = [
+  "Tout",
+  ...Array.from(new Set(NEWS.map((n) => n.category))),
+];
+
+
+
+export const GALLERY = [
+  "/img/troisquart/BMW-Vision_M_Next_Concept-2019-wallpaper.webp",
+  "/img/d.webp",
+  "/img/troisquart/BMW-Skytop-2025-Rear_Three-Quarter.60c0a162.webp",
+  "/img/troisquart/BMW-7-Series-2027-wallpaper.webp",
+];
