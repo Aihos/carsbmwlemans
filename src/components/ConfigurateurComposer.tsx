@@ -16,7 +16,6 @@ import {
   TRIMS,
   WHEELS,
   inkRatio,
-  inkStyle,
 } from "../data/site";
 import { gsap, useGSAP, reduced } from "../lib/anim";
 
