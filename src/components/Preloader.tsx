@@ -133,13 +133,13 @@ export default function Preloader({ onReveal, onDone }: Props) {
               const r = s.getBoundingClientRect();
               return Math.max(window.innerWidth / r.width, window.innerHeight / r.height) * 1.06;
             },
-            duration: 0.6,
+            duration: 1.5,
             ease: "power3.inOut",
           },
           T_END + 0.12,
         )
         .add(() => fireReveal(), T_END + 0.46)
-        .to(root.current, { yPercent: -100, duration: 0.8, ease: "power4.inOut" }, T_END + 0.5)
+        .to(root.current, { yPercent: -100, duration: 2, ease: "power4.inOut" }, T_END + 0.5)
         .set(root.current, { pointerEvents: "none" });
     };
 

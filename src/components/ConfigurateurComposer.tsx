@@ -215,8 +215,8 @@ export default function ConfigurateurComposer({
                     <img
                       src={car.img}
                       alt={`${car.name} configurée`}
-                      className="absolute"
-                      style={inkStyle(car.bbox)}
+                      className="absolute h-full"
+                    /*   style={inkStyle(car.bbox)} */
                     />
                   </div>
                 ) : (

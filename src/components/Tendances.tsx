@@ -1,7 +1,32 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type MouseEvent as ReactMouseEvent,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { gsap, useGSAP, reduced } from "../lib/anim";
 import { CARS, EUR, EUR2, ROUNDEL, inkRatio, inkStyle } from "../data/site";
 import SmartLink from "./SmartLink";
+
+/* Glissement au doigt du carrousel.
+   DRAG_MIN  : déplacement avant de décider si le geste part à l'horizontale.
+   DRAG_STEP : distance qui fait passer au modèle suivant ou précédent.
+   FLICK_*   : un geste court mais rapide change aussi de modèle. */
+const DRAG_MIN = 8;
+const DRAG_STEP = 56;
+const FLICK_DIST = 18;
+const FLICK_SPEED = 0.45; // px/ms
+
+type Drag = {
+  id: number;
+  x: number;
+  y: number;
+  /** translateX du rail au moment de la prise en main. */
+  base: number;
+  t: number;
+  axis: "" | "x" | "y";
+};
 
 export default function Tendances() {
   const root = useRef<HTMLElement>(null);
@@ -9,6 +34,10 @@ export default function Tendances() {
   const viewport = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
   const [maxIndex, setMaxIndex] = useState(Math.max(0, CARS.length - 4));
+  /** Geste en cours (null = aucun). */
+  const drag = useRef<Drag | null>(null);
+  /** Horodatage du dernier glissement : sert à ne pas ouvrir un lien au lâcher. */
+  const lastDrag = useRef(0);
 
   const gap = () => {
     const t = track.current;
@@ -37,19 +66,82 @@ export default function Tendances() {
     return () => window.removeEventListener("resize", compute);
   }, []);
 
-  useGSAP(
-    () => {
-      if (!track.current) return;
-      gsap.to(track.current, {
-        x: -index * step(),
-        duration: reduced() ? 0 : 0.85,
-        ease: "power3.inOut",
-      });
-    },
-    { dependencies: [index] },
-  );
+  /** Amène le rail sur le modèle `i`. `duration` sert au retour élastique. */
+  const animateTo = (i: number, duration = 0.85) => {
+    if (!track.current) return;
+    gsap.to(track.current, {
+      x: -i * step(),
+      duration: reduced() ? 0 : duration,
+      ease: "power3.inOut",
+    });
+  };
+
+  useGSAP(() => animateTo(index), { dependencies: [index] });
 
   const go = (d: number) => setIndex((v) => Math.min(Math.max(v + d, 0), maxIndex));
+
+  /* Glissement au doigt : le rail suit le doigt, puis se cale sur un modèle.
+     La souris est exclue, le carrousel garde ses flèches sur ordinateur. */
+  const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    const t = track.current;
+    if (!t || e.pointerType === "mouse" || e.button !== 0) return;
+    gsap.killTweensOf(t);
+    drag.current = {
+      id: e.pointerId,
+      x: e.clientX,
+      y: e.clientY,
+      base: Number(gsap.getProperty(t, "x")) || 0,
+      t: performance.now(),
+      axis: "",
+    };
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* capture indisponible : les évènements continuent d'arriver au parent */
+    }
+  };
+
+  const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    const d = drag.current;
+    const t = track.current;
+    if (!d || !t || d.id !== e.pointerId) return;
+    const dx = e.clientX - d.x;
+    if (!d.axis) {
+      const dy = e.clientY - d.y;
+      if (Math.abs(dx) < DRAG_MIN && Math.abs(dy) < DRAG_MIN) return;
+      d.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+    }
+    if (d.axis !== "x") return;
+    // Résistance aux extrémités : le rail freine au lieu de partir.
+    const min = -maxIndex * step();
+    let x = d.base + dx;
+    if (x > 0) x *= 0.35;
+    else if (x < min) x = min + (x - min) * 0.35;
+    gsap.set(t, { x });
+  };
+
+  const endDrag = (e: ReactPointerEvent<HTMLDivElement>, cancelled = false) => {
+    const d = drag.current;
+    if (!d || d.id !== e.pointerId) return;
+    drag.current = null;
+    if (d.axis !== "x") return;
+    const dx = cancelled ? 0 : e.clientX - d.x;
+    const speed = dx / Math.max(1, performance.now() - d.t);
+    const flick = Math.abs(dx) > FLICK_DIST && Math.abs(speed) > FLICK_SPEED;
+    let target = index;
+    if (dx <= -DRAG_STEP || (flick && dx < 0)) target = Math.min(index + 1, maxIndex);
+    else if (dx >= DRAG_STEP || (flick && dx > 0)) target = Math.max(index - 1, 0);
+    lastDrag.current = performance.now();
+    if (target !== index) setIndex(target);
+    else animateTo(index, 0.35);
+  };
+
+  /** Un glissement ne doit pas ouvrir la fiche du modèle au lâcher. */
+  const onClickCapture = (e: ReactMouseEvent<HTMLDivElement>) => {
+    if (performance.now() - lastDrag.current > 500) return;
+    e.preventDefault();
+    e.stopPropagation();
+  };
 
   return (
     <section id="tendances" ref={root} className="relative overflow-hidden py-16 md:py-24">
@@ -87,8 +179,17 @@ export default function Tendances() {
           </div>
         </div>
 
-        <div ref={viewport} className="mt-10 overflow-hidden md:mt-14">
-          <div ref={track} className="flex gap-6 will-change-transform">
+        <div
+          ref={viewport}
+          className="mt-10 overflow-hidden overscroll-x-none md:mt-14"
+          style={{ touchAction: "pan-y" }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={(e) => endDrag(e)}
+          onPointerCancel={(e) => endDrag(e, true)}
+          onClickCapture={onClickCapture}
+        >
+          <div ref={track} className="flex cursor-grab select-none gap-6 will-change-transform active:cursor-grabbing">
             {CARS.map((c) => (
               <article
                 key={c.id}
@@ -100,16 +201,24 @@ export default function Tendances() {
                     src={ROUNDEL}
                     alt=""
                     aria-hidden="true"
+                    draggable={false}
                     className="watermark left-1/2 top-1/2 w-[74%] -translate-x-1/2 -translate-y-1/2 opacity-[0.09] grayscale"
                   />
                   {c.bbox ? (
                     <div className="relative z-10 w-[86%]" style={{ aspectRatio: inkRatio(c.bbox) }}>
-                      <img src={c.img} alt={c.name} className="absolute" style={inkStyle(c.bbox)} />
+                      <img
+                        src={c.img}
+                        alt={c.name}
+                        draggable={false}
+                        className="absolute"
+                        style={inkStyle(c.bbox)}
+                      />
                     </div>
                   ) : (
                     <img
                       src={c.img}
                       alt={c.name}
+                      draggable={false}
                       className="relative z-10 w-[94%] transition-transform duration-700 group-hover:scale-[1.04]"
                     />
                   )}
@@ -158,6 +267,10 @@ export default function Tendances() {
             <span aria-hidden="true">▶</span>
           </button>
         </div>
+
+        <p className="mt-4 text-center text-[10px] uppercase tracking-[0.16em] text-ink/40 md:hidden">
+          Glissez pour parcourir
+        </p>
       </div>
     </section>
   );

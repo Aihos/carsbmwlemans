@@ -1,3 +1,5 @@
+import { VEHICULES } from "./vehicules";
+
 export type BBox = {
   /** largeur du fichier source (px) */
   w: number;
@@ -56,67 +58,6 @@ export const inkStyle = (b: BBox) => {
   };
 };
 
-export const CARS: Car[] = [
-  {
-    id: "z4",
-    name: "BMW Z4",
-    motorisation: "6 cylindres en ligne · 340 ch",
-    price: 56660,
-    monthly: 752.69,
-    img: "/img/produit/voitureA-net.png",
-    tag: "NEUF · EN STOCK",
-  },
-  {
-    id: "z8",
-    name: "BMW Z8",
-    motorisation: "V8 4,9 L · 400 ch",
-    price: 189500,
-    monthly: 2517.32,
-    img: "/img/intro/1.png",
-    bbox: INTRO_BBOX["/img/intro/1.png"],
-    tag: "BMW CLASSIC",
-  },
-  {
-    id: "i8",
-    name: "BMW i8",
-    motorisation: "Hybride rechargeable · 374 ch",
-    price: 96400,
-    monthly: 1280.58,
-    img: "/img/intro/2.png",
-    bbox: INTRO_BBOX["/img/intro/2.png"],
-    tag: "BMW i",
-  },
-  {
-    id: "e30",
-    name: "BMW 325i",
-    motorisation: "6 cylindres en ligne · 170 ch",
-    price: 34900,
-    monthly: 463.61,
-    img: "/img/intro/3.png",
-    bbox: INTRO_BBOX["/img/intro/3.png"],
-    tag: "BMW CLASSIC",
-  },
-  {
-    id: "m2",
-    name: "BMW M2",
-    motorisation: "6 cylindres en ligne · 480 ch",
-    price: 62400,
-    monthly: 828.92,
-    img: "/img/intro/4.png",
-    bbox: INTRO_BBOX["/img/intro/4.png"],
-    tag: "BMW M",
-  },
-  {
-    id: "m2c",
-    name: "BMW M2 Compétition",
-    motorisation: "6 cylindres en ligne · 510 ch",
-    price: 71200,
-    monthly: 945.82,
-    img: "/img/intro/5.png",
-    bbox: INTRO_BBOX["/img/intro/5.png"],
-    tag: "BMW M",
-  },
-];
 
 export const COLORS = [
   { id: "silver", name: "Titanium Silver", hex: "#c6cbd1" },
@@ -146,8 +87,8 @@ export const ENGINES: Engine[] = [
   { id: "e54", name: "V8 5,4 L", label: "M Performance", power: "452 ch", price: 12400 },
 ];
 
-export const BASE_PRICE = 56660;
-export const CAR_NAME = "BMW Z4";
+export const BASE_PRICE = 74900;
+export const CAR_NAME = "BMW Z4 M40i";
 
 /* ─────────────── Intérieur & accessoires (atelier de configuration) ─────────────── */
 
@@ -299,7 +240,7 @@ export const NAV = [
 
 /* ─────────────────────────── Catalogue ─────────────────────────── */
 
-export type Family = "BMW M" | "BMW i" | "BMW Classic";
+export type Family = "BMW M" | "BMW i" | "BMW Série";
 
 export type CatalogueCar = {
   id: string;
@@ -317,100 +258,24 @@ export type CatalogueCar = {
   tag?: string;
 };
 
-/** Mensualité indicative (60 mois, apport 10 %) — même barème que les
-    modèles déjà chiffrés dans CARS. */
-const financed = (price: number) => Math.round(price * 0.013285 * 100) / 100;
+export const CATALOGUE: CatalogueCar[] = VEHICULES;
 
-/** Fiche technique des modèles de `CARS` (visuels détourés). */
-const SHEETS: Record<string, Pick<CatalogueCar, "energy" | "family" | "year" | "km" | "gearbox">> = {
-  z4: { energy: "Essence", family: "BMW M", year: 2024, km: 0, gearbox: "Automatique" },
-  z8: { energy: "Essence", family: "BMW Classic", year: 2001, km: 42800, gearbox: "Manuelle" },
-  i8: { energy: "Hybride rechargeable", family: "BMW i", year: 2019, km: 26400, gearbox: "Automatique" },
-  e30: { energy: "Essence", family: "BMW Classic", year: 1990, km: 121000, gearbox: "Manuelle" },
-  m2: { energy: "Essence", family: "BMW M", year: 2023, km: 8600, gearbox: "Automatique" },
-  m2c: { energy: "Essence", family: "BMW M", year: 2024, km: 3100, gearbox: "Automatique" },
-};
-
-/** Arrivages, fonds de stock et électriques (photos trois-quarts / profils). */
-const ARRIVAGES: CatalogueCar[] = [
-  {
-    id: "i5",
-    name: "BMW i5 eDrive40",
-    motorisation: "Électrique · 340 ch · 582 km WLTP",
-    energy: "Électrique",
-    family: "BMW i",
-    year: 2024,
-    km: 0,
-    gearbox: "Automatique",
-    price: 78900,
-    monthly: financed(78900),
-    img: "/img/BMW-i5-2024-Side_Profile.17799284.webp",
-    tag: "NEUF · EN STOCK",
-  },
-  {
-    id: "ix2",
-    name: "BMW iX2 xDrive30",
-    motorisation: "Électrique · 313 ch · 449 km WLTP",
-    energy: "Électrique",
-    family: "BMW i",
-    year: 2024,
-    km: 4200,
-    gearbox: "Automatique",
-    price: 58400,
-    monthly: financed(58400),
-    img: "/img/BMW-iX2-2024-Side_Profile.e5efc40a.webp",
-    tag: "0 KM DÉMONSTRATION",
-  },
-  {
-    id: "ix5",
-    name: "BMW iX5",
-    motorisation: "Électrique · 400 ch · 620 km WLTP",
-    energy: "Électrique",
-    family: "BMW i",
-    year: 2027,
-    km: 0,
-    gearbox: "Automatique",
-    price: 92000,
-    monthly: financed(92000),
-    img: "/img/BMW-iX5-2027-Side_Profile.5ae9ad71.webp",
-    tag: "PRÉCOMMANDE",
-  },
-  {
-    id: "b503",
-    name: "BMW 503 Coupé",
-    motorisation: "V8 3,2 L · 140 ch",
-    energy: "Essence",
-    family: "BMW Classic",
-    year: 1956,
-    km: 68400,
-    gearbox: "Manuelle",
-    price: 148000,
-    monthly: financed(148000),
-    img: "/img/BMW-503_Coupe-1956-Side_Profile.83b9c17e.webp",
-    tag: "BMW CLASSIC",
-  },
-  {
-    id: "b507",
-    name: "BMW 507 Roadster",
-    motorisation: "V8 3,2 L · 150 ch",
-    energy: "Essence",
-    family: "BMW Classic",
-    year: 1957,
-    km: 41200,
-    gearbox: "Manuelle",
-    price: 1450000,
-    monthly: financed(1450000),
-    img: "/img/BMW-507-1956-Side_Profile.18bb170f.webp",
-    tag: "BMW CLASSIC",
-  },
+/* Les six modèles mis en avant par le carrousel « Nos modèles » de l'accueil,
+   et proposés dans le configurateur : une sélection courte, un par univers
+   (roadster, sportive, berline électrique, SUV électrique, SUV hybride, break M).
+   Le premier est le modèle ouvert par défaut par le configurateur. */
+const SHOWCASE = [
+  "bmw-z4-m40i",
+  "bmw-m2-m-xdrive",
+  "bmw-i5-edrive40-berline",
+  "bmw-ix3-50-xdrive",
+  "bmw-x5-50e-xdrive",
+  "bmw-m5-touring",
 ];
 
-export const CATALOGUE: CatalogueCar[] = [
-  ...CARS.map((c) => ({ ...c, ...SHEETS[c.id] })),
-  ...ARRIVAGES,
-];
+export const CARS: Car[] = SHOWCASE.map((id) => CATALOGUE.find((c) => c.id === id)!);
 
-export const FAMILIES: Family[] = ["BMW M", "BMW i", "BMW Classic"];
+export const FAMILIES: Family[] = ["BMW M", "BMW i", "BMW Série"];
 
 export const SORTS = [
   { id: "price-asc", label: "Prix croissant" },
@@ -505,7 +370,7 @@ export const NEWS: News[] = [
       "La M2 reste la plus compacte des BMW M, et la plus joueuse. Notre exemplaire de démonstration est disponible pour un essai encadré sur les routes de la Sarthe.",
     img: "/img/troisquart/BMW-M2-2025-wallpaper.webp",
     alt: "BMW M2, trois-quarts",
-    to: "/configurateur?modele=m2",
+    to: "/configurateur?modele=bmw-m2-m-xdrive",
   },
   {
     id: "news-i5",
