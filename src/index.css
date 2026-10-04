@@ -48,12 +48,11 @@
 */
 
 @theme {
-  /* Pile BMW : BMW Type Next Pro (le vrai fichier) → Inter (repli libre pendant
-     le chargement) → pile système. Une seule famille pour tout le site. */
-  --font-sans: "BMWTypeNext Pro", "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  --font-display: "BMWTypeNext Pro", "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
+  /* Pile BMW : BMW Type Next Pro (le vrai fichier) → Helvetica, puis la pile
+     générique. Aucune police distante n'est chargée. Une seule famille pour
+     tout le site. */
+  --font-sans: "BMWTypeNext Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display: "BMWTypeNext Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   /* Un seul bleu de marque : #00559D */
   --color-ink: #06213f;

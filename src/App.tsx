@@ -8,6 +8,7 @@ import Catalogue from "./pages/Catalogue";
 import ConfigurateurPage from "./pages/ConfigurateurPage";
 import ActualitesPage from "./pages/ActualitesPage";
 import { ScrollTrigger, initScrollAnimations } from "./lib/anim";
+import { ReservationProvider } from "./lib/reservation";
 
 /* Coquille du site : préloader, header, routes, footer.
    Le préloader ne se joue qu'une fois, au premier chargement. */
@@ -68,7 +69,9 @@ function Shell() {
 export default function App() {
   return (
     <BrowserRouter>
-      <Shell />
+      <ReservationProvider>
+        <Shell />
+      </ReservationProvider>
     </BrowserRouter>
   );
 }

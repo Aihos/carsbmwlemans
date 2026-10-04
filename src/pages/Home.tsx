@@ -3,7 +3,7 @@ import Tendances from "../components/Tendances";
 import Actualites from "../components/Actualites";
 /* import ConfigurateurComposer from "../components/ConfigurateurComposer"; */
 import Gallery from "../components/Gallery";
-import Booking from "../components/Booking";
+/* import Booking from "../components/Booking"; */
 import { usePageMeta } from "../lib/seo";
 import BandeauCOnfigurateurMini from "../components/bandeauCOnfigurateurmini";
 
@@ -13,7 +13,7 @@ import BandeauCOnfigurateurMini from "../components/bandeauCOnfigurateurmini";
    (même code, même popup de rendez-vous). */
 export default function Home({ ready }: { ready: boolean }) {
   usePageMeta(
-    "Concession BMW au Mans — Le plaisir de conduire",
+    "Concession BMW au Mans, Le plaisir de conduire",
     "BMW Ampère Autopassion, concession BMW au Mans : gamme BMW M, BMW i et BMW Classic, configurateur, essais et prise de rendez-vous en ligne.",
   );
 
@@ -25,7 +25,7 @@ export default function Home({ ready }: { ready: boolean }) {
       <Actualites />
       {/* <ConfigurateurComposer variant="home" /> */}
       <Gallery />
-      <Booking />
+    {/*   <Booking /> */}
     </>
   );
 }

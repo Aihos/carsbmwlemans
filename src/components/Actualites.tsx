@@ -50,28 +50,12 @@ export default function Actualites() {
   return (
     <section id="actualites" ref={root} className="relative overflow-hidden bg-white">
       <div className="mx-auto max-w-[1600px] px-5 py-16 md:px-10 md:py-24">
-        <p className="act-head text-[10px] font-semibold uppercase tracking-[0.3em] text-ink/45">
+        {/* <p className="act-head text-[10px] font-semibold uppercase tracking-[0.3em] text-ink/45">
           Actualités
-        </p>
+        </p> */}
 
-        <div className="relative mt-8 md:mt-10">
-          {/* Flèches */}
-          <button
-            type="button"
-            onClick={() => go(-1)}
-            aria-label="Actualité précédente"
-            className="absolute left-0 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center text-2xl text-ink/60 transition-colors hover:text-ink md:flex"
-          >
-            <span aria-hidden="true">‹</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => go(1)}
-            aria-label="Actualité suivante"
-            className="absolute right-0 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center text-2xl text-ink/60 transition-colors hover:text-ink md:flex"
-          >
-            <span aria-hidden="true">›</span>
-          </button>
+        <div className="relative mt-8 md:mt-10 flex">
+         
 
           {NEWS.map((n, i) => {
             const active = i === index;
@@ -85,7 +69,27 @@ export default function Actualites() {
                     : "pointer-events-none absolute inset-0 -translate-y-2 opacity-0"
                 }`}
               >
+                
                 <div className="md:pl-[7%]">
+                  <div className=" flex flex-row ">
+                     {/* Flèches */}
+          <button
+            type="button"
+            onClick={() => go(-1)}
+            aria-label="Actualité précédente"
+            className=" left-0 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center text-2xl text-ink/60 transition-colors hover:text-ink md:flex"
+          >
+            <span aria-hidden="true">‹</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => go(1)}
+            aria-label="Actualité suivante"
+            className=" right-0 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center text-2xl text-ink/60 transition-colors hover:text-ink md:flex"
+          >
+            <span aria-hidden="true">›</span>
+          </button>
+                  </div>
                   <p className="text-[11px] uppercase tracking-[0.22em] text-ink/50">{n.category}</p>
                   <h2 className="mt-4 max-w-2xl text-[clamp(1.75rem,3.5vw,3rem)] font-extrabold uppercase leading-[1.04] tracking-[-0.01em] text-ink">
                     {n.title}
@@ -128,7 +132,7 @@ export default function Actualites() {
                 aria-label={`Afficher l'actualité ${i + 1} sur ${NEWS.length}`}
                 aria-current={i === index}
                 className={`h-2.5 rounded-full transition-all duration-300 ${
-                  i === index ? "w-2.5 bg-brand ring-4 ring-brand/25" : "w-2.5 bg-ink/20 hover:bg-ink/40"
+                  i === index ? "w-2.5 bg-brand ring-4 ring-ink/25" : "w-2.5 bg-ink/20 hover:bg-ink/40"
                 }`}
               />
             ))}

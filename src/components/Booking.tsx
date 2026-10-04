@@ -77,18 +77,18 @@ export default function Booking() {
            le visiteur, lui, n'a besoin que d'un message utile. */
         console.error("[/api/reservation]", data.error);
         setStatus("error");
-        setFeedback("L'envoi n'a pas abouti. Merci de réessayer ou de nous appeler au 06 49 01 53 34.");
+        setFeedback("L'envoi n'a pas abouti. Merci de réessayer ou de nous appeler au 02 43 85 00 11.");
         return;
       }
       setStatus("ok");
     } catch {
       setStatus("error");
-      setFeedback("Connexion impossible. Merci de nous appeler au 06 49 01 53 34.");
+      setFeedback("Connexion impossible. Merci de nous appeler au 02 43 85 00 11.");
     }
   };
 
   const fieldClass =
-    "mt-2 w-full border border-line bg-mist px-4 py-3 text-sm text-ink placeholder:text-ink/35 focus:border-brand focus:outline-none";
+    "mt-2 w-full border border-line bg-mist px-4 py-3 text-sm text-ink placeholder:text-ink/35 focus:border-ink focus:outline-none";
   const labelClass = "text-[9px] font-bold uppercase tracking-[0.2em] text-ink/50";
 
   return (
@@ -135,7 +135,7 @@ export default function Booking() {
             </p>
 
             {configuration && (
-              <p className="mt-4 border-l-2 border-brand bg-mist px-4 py-3 text-[11px] leading-relaxed text-ink/70">
+              <p className="mt-4 border-l-2 border-ink bg-mist px-4 py-3 text-[11px] leading-relaxed text-ink/70">
                 <span className={labelClass}>Configuration retenue</span>
                 <span className="mt-1 block font-bold text-ink">{configuration}</span>
               </p>
@@ -252,7 +252,7 @@ export default function Booking() {
                 aria-live="polite"
                 className={`text-[11px] font-bold text-brand ${sent ? "" : "hidden"}`}
               >
-                Merci — votre demande a bien été transmise. Nous confirmons votre créneau
+                Merci, votre demande a bien été transmise. Nous confirmons votre créneau
                 rapidement.
               </p>
 

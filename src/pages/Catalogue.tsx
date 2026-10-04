@@ -188,7 +188,7 @@ export default function Catalogue() {
           <div className="border-t border-line py-20 text-center">
             <p className="text-[22px] text-ink md:text-[26px]">Aucun véhicule ne correspond</p>
             <p className="mx-auto mt-3 max-w-md text-[12px] leading-relaxed text-ink/55">
-              Élargissez la recherche — ou confiez-nous votre recherche : nous trouvons votre BMW
+              Élargissez la recherche, ou confiez-nous votre recherche : nous trouvons votre BMW
               dans le réseau de la marque.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">

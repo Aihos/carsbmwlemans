@@ -28,6 +28,11 @@ const T_START = 0.45;
 const T_END = T_START + CARS.length * LOOPS * PASS;
 const LAST = CARS.length - 1;
 
+/* Vitesse de lecture de la timeline.
+   Base 1,43 = réglage d'origine (~30 % plus rapide) ; × 1/0,75 = 25 % plus
+   rapide encore, demandé ensuite. Modifier ici suffit : tout l'écran suit. */
+const SPEED = 1.43 / 0.75; // ≈ 1,91
+
 const IMAGES = [...CARS.map((c) => c.src), "/img/produit/voitureA-net.png", ...GALLERY];
 
 function preload(srcs: string[]) {
@@ -84,8 +89,8 @@ export default function Preloader({ onReveal, onDone }: Props) {
 
       tl = gsap.timeline({ onComplete: fireDone });
       const line = tl;
-      /* Écran de chargement ~30 % plus rapide (durée totale / 0,7) */
-      line.timeScale(1.43);
+      /* Écran de chargement accéléré, voir SPEED en tête de fichier. */
+      line.timeScale(SPEED);
 
       // 1. le carré bleu et le compteur se posent
       line.to(square.current, { autoAlpha: 1, scale: 1, duration: 0.55, ease: "power3.out" }, 0)
