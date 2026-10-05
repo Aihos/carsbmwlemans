@@ -33,6 +33,33 @@ type Props = {
 /* Visuel du bandeau, un essai sur la côte, comme la galerie. */
 const BANNER = "/img/d.webp";
 
+/* Créneaux de la prise de rendez-vous.
+   Deux jours seulement, ceux de l'événement (EVENT.jours) : vendredi 13 et
+   samedi 14 novembre 2026. Chaque essai dure 30 minutes ; les créneaux sont
+   engendrés de l'ouverture à la fermeture du jour choisi. */
+const JOURS = EVENT.jours.map((label, i) => ({
+  value: `${label} 2026`,
+  label,
+  ferme: i === 0 ? 19 * 60 : 18 * 60, // vendredi 19h, samedi 18h
+}));
+
+const OUVRE = 9 * 60; // 9h
+const PAS = 30; // durée d'un créneau, en minutes
+
+/** 570 → « 09h30 » */
+const heure = (min: number) =>
+  `${String(Math.floor(min / 60)).padStart(2, "0")}h${String(min % 60).padStart(2, "0")}`;
+
+/** Créneaux de 30 minutes, d'un bout à l'autre de la journée. */
+const creneaux = (ferme: number) => {
+  const out: string[] = [];
+  for (let t = OUVRE; t + PAS <= ferme; t += PAS) out.push(`${heure(t)} – ${heure(t + PAS)}`);
+  return out;
+};
+
+const creneauxDuJour = (value: string) =>
+  creneaux((JOURS.find((j) => j.value === value) ?? JOURS[0]).ferme);
+
 /* Popup de rendez-vous.
    Même grammaire que les blocs actualités : un visuel plein cadre, le texte posé
    dessus (micro-libellé + filet + titre), puis un corps sans aucun contenant —
@@ -58,6 +85,7 @@ export default function ContactModal({
 }: Props) {
   const [status, setStatus] = useState<Status>("idle");
   const [feedback, setFeedback] = useState("");
+  const [jour, setJour] = useState(JOURS[0].value);
   const firstField = useRef<HTMLInputElement>(null);
 
   const configured = Boolean(vehicule);
@@ -84,6 +112,7 @@ export default function ContactModal({
     if (open) {
       setStatus("idle");
       setFeedback("");
+      setJour(JOURS[0].value);
     }
   }, [open]);
 
@@ -295,23 +324,43 @@ export default function ContactModal({
                 </label>
 
                 <label className="block">
-                  <span className={label}>Date souhaitée</span>
-                  <input type="date" name="date" className={`mt-2 ${field}`} />
+                  <span className={label}>Jour de l'essai</span>
+                  <span className="relative mt-2 block">
+                    <select
+                      name="date"
+                      value={jour}
+                      onChange={(e) => setJour(e.target.value)}
+                      className={`${field} appearance-none pr-6`}
+                    >
+                      {JOURS.map((j) => (
+                        <option key={j.value} value={j.value}>
+                          {j.label} · {heure(OUVRE)} – {heure(j.ferme)}
+                        </option>
+                      ))}
+                    </select>
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-[9px] text-ink/40"
+                    >
+                      ▾
+                    </span>
+                  </span>
                 </label>
 
                 <label className="block">
-                  <span className={label}>Créneau</span>
+                  <span className={label}>Créneau (30 min)</span>
                   <span className="relative mt-2 block">
                     <select
+                      key={jour}
                       name="creneau"
-                      defaultValue="09h00 – 10h00"
+                      defaultValue={creneauxDuJour(jour)[0]}
                       className={`${field} appearance-none pr-6`}
                     >
-                      <option>09h00 – 10h00</option>
-                      <option>10h30 – 11h30</option>
-                      <option>14h00 – 15h00</option>
-                      <option>16h00 – 17h00</option>
-                      <option>17h30 – 18h30</option>
+                      {creneauxDuJour(jour).map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
                     </select>
                     <span
                       aria-hidden="true"
