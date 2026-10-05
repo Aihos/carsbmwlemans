@@ -25,7 +25,7 @@ const jour = (iso: string) => {
 export default function ActualitesPage() {
   usePageMeta(
     "Actualités des ventes privées BMW",
-    "Ce que la concession BMW Ampère Autopassion prépare pour ses ventes privées au Mans : véhicules exposés, BMW M, BMW i, BMW Classic, atelier et reprises.",
+    "Ce que la concession BMW Amplitude Automobiles prépare pour ses ventes privées au Mans : véhicules exposés, BMW M, BMW i, BMW Classic, atelier et reprises.",
   );
 
   const root = useRef<HTMLElement>(null);
@@ -68,7 +68,7 @@ export default function ActualitesPage() {
       {/* Chapeau */}
       <div className="mx-auto max-w-[1600px] px-5 pt-10 md:px-10 md:pt-16">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink/50">
-          Actualités · Ventes privées, Ampère Autopassion Le Mans
+          Actualités · Ventes privées, Amplitude Automobiles Le Mans
         </p>
         <h1 className="mt-3 max-w-4xl text-[28px] leading-[1.15] text-ink md:text-[36px]">
           Ce qui se prépare pour les ventes privées

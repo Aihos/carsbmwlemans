@@ -14,7 +14,7 @@ import BandeauCOnfigurateurMini from "../components/bandeauCOnfigurateurmini";
 export default function Home({ ready }: { ready: boolean }) {
   usePageMeta(
     "Ventes privées BMW au Mans",
-    "Ventes privées BMW Ampère Autopassion, au Mans : deux jours sur invitation, véhicules exposés, essais sur créneau, reprise bonifiée et financement étudié en concession.",
+    "Ventes privées BMW Amplitude Automobiles, au Mans : deux jours sur invitation, véhicules exposés, essais sur créneau, reprise bonifiée et financement étudié en concession.",
   );
 
   return (

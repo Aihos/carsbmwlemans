@@ -1,6 +1,6 @@
-# VitrineCars — BMW Ampère Autopassion (Le Mans)
+# VitrineCars — BMW Amplitude Automobiles (Le Mans)
 
-Vitrine React + Vite pour la concession BMW Ampère Autopassion.
+Vitrine React + Vite pour la concession BMW Amplitude Automobiles.
 Trois pages : accueil one-page animée (`/`), catalogue (`/catalogue`),
 configurateur grand format (`/configurateur`). Stack : Vite + React 19 +
 TypeScript + Tailwind v4 + GSAP (ScrollTrigger) + react-router.

@@ -180,7 +180,7 @@ export async function downloadConfirmationPdf(r: Reservation) {
   doc.setFontSize(7.5);
   doc.setCharSpace(0.6);
   doc.setTextColor(190, 214, 238);
-  doc.text("VENTES PRIVÉES BMW · AMPÈRE AUTOPASSION, LE MANS", M, 18);
+  doc.text("VENTES PRIVÉES BMW · AMPLITUDE AUTOMOBILES, LE MANS", M, 18);
 
   doc.setCharSpace(0);
   doc.setFontSize(19);

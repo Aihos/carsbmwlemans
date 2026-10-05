@@ -104,7 +104,7 @@ export default function Footer() {
               />
               <span className="leading-none">
                 <span className="block text-[15px] uppercase leading-tight tracking-[0.14em] md:text-base">
-                  Ampère Autopassion
+                  Amplitude Automobiles
                 </span>
                 <span className="mt-1.5 block text-[10px] uppercase tracking-[0.24em] text-white/50">
                   Le Mans · France

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const SITE = "BMW Ampère Autopassion, Le Mans";
+const SITE = "BMW Amplitude Automobiles, Le Mans";
 
 /** Titre de l'onglet + meta description, par page. */
 export function usePageMeta(title: string, description?: string) {

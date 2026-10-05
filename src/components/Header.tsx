@@ -48,7 +48,7 @@ export default function Header({ ready }: { ready: boolean }) {
       } ${solid ? "border-b border-line bg-page/85 backdrop-blur-md" : ""}`}
     >
       <div className="mx-auto flex h-20 max-w-[1700px] items-center justify-between gap-6 px-5 md:h-24 md:px-10">
-        <SmartLink to="/" ariaLabel="Ampère Autopassion, Le Mans" className="shrink-0">
+        <SmartLink to="/" ariaLabel="Amplitude Automobiles, Le Mans" className="shrink-0">
           {/* Logo blanc sur la vidéo du hero (accueil), noir sur les pages
               intérieures à fond clair (catalogue, configurateur). */}
           <img

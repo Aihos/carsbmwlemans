@@ -530,7 +530,7 @@ export default function ContactModal({
                       <div>
                         <dt className={label}>Concession</dt>
                         <dd className="mt-1 text-[14px] font-semibold text-ink">
-                          Ampère Autopassion · Le Mans, Sarthe
+                          Amplitude Automobiles · Le Mans, Sarthe
                         </dd>
                       </div>
                     </dl>

@@ -22,7 +22,7 @@ type Payload = {
 };
 
 const LIMIT = 16_000;
-const LIEU = "Ventes privées BMW Ampère Autopassion, Le Mans · 13 & 14 novembre 2026";
+const LIEU = "Ventes privées BMW Amplitude Automobiles, Le Mans · 13 & 14 novembre 2026";
 
 /* Journalisation. En développement, on trace tout (y compris le contenu du
    formulaire) pour pouvoir diagnostiquer. En production, on ne trace que le
@@ -258,7 +258,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   /* 1. Notification interne : c'est elle qui porte la demande. */
   const sujetInterne = `Créneau ventes privées — ${vehicule || "véhicule à préciser"} · ${nom}`;
   const textInterne = [
-    "Nouvelle demande de créneau — Ventes privées BMW Ampère Autopassion (Le Mans)",
+    "Nouvelle demande de créneau — Ventes privées BMW Amplitude Automobiles (Le Mans)",
     "",
     details,
     "",
@@ -289,7 +289,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   const textClient = [
     `${nom},`,
     "",
-    "Nous avons reçu votre demande de créneau pour les ventes privées BMW Ampère Autopassion (Le Mans).",
+    "Nous avons reçu votre demande de créneau pour les ventes privées BMW Amplitude Automobiles (Le Mans).",
     "Un conseiller vous confirme votre horaire par email et par téléphone.",
     "",
     details,
@@ -306,7 +306,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     <div style="font-family:Helvetica,Arial,sans-serif;color:#06213f;line-height:1.6">
       <h2 style="margin:0 0 4px;font-size:18px">Votre demande de créneau est enregistrée</h2>
       <p style="margin:0 0 18px;font-size:13px;color:#5a6b80">
-        ${esc(nom)}, nous avons bien reçu votre demande pour les ventes privées BMW Ampère Autopassion.
+        ${esc(nom)}, nous avons bien reçu votre demande pour les ventes privées BMW Amplitude Automobiles.
         Un conseiller vous confirme votre horaire par email et par téléphone.
       </p>
       ${tableHtml}

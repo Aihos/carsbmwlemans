@@ -38,7 +38,7 @@ export default function Confirmation() {
   usePageMeta(
     data ? "Demande de créneau enregistrée" : "Aucune demande à afficher",
     data
-      ? "Votre demande de rendez-vous pour les ventes privées BMW Ampère Autopassion est transmise. Téléchargez la confirmation et le récapitulatif de votre créneau."
+      ? "Votre demande de rendez-vous pour les ventes privées BMW Amplitude Automobiles est transmise. Téléchargez la confirmation et le récapitulatif de votre créneau."
       : "Cette page récapitule une demande de créneau de rendez-vous, juste après son envoi.",
   );
 
@@ -75,7 +75,7 @@ export default function Confirmation() {
     return (
       <section className="mx-auto max-w-[1600px] px-5 py-24 md:px-10 md:py-32">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink/50">
-          Ventes privées · Ampère Autopassion, Le Mans
+          Ventes privées · Amplitude Automobiles, Le Mans
         </p>
         <h1 className="mt-3 max-w-2xl font-display text-[clamp(1.6rem,3.4vw,2.6rem)] font-bold uppercase leading-[1.06] text-ink">
           Aucune demande à afficher
@@ -228,7 +228,7 @@ export default function Confirmation() {
                 <div>
                   <dt className={label}>Concession</dt>
                   <dd className="mt-1 text-[14px] font-semibold text-ink">
-                    Ampère Autopassion · {EVENT.lieu}
+                    Amplitude Automobiles · {EVENT.lieu}
                   </dd>
                 </div>
               </dl>

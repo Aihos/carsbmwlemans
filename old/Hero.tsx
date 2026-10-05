@@ -92,7 +92,7 @@ export default function Hero({ ready }: { ready: boolean }) {
         <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-start md:gap-16">
           <div className="max-w-xl">
             <p className="hero-meta text-[10px] font-semibold uppercase tracking-[0.3em] text-ink/60 md:text-xs">
-              BMW Ampère Autopassion
+              BMW Amplitude Automobiles
             </p>
             <div className="mt-4 flex flex-wrap gap-3 md:mt-6">
               <SmartLink

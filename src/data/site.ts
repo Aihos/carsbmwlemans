@@ -248,7 +248,7 @@ export const EUR2 = (n: number) =>
    lisent cet objet. Dates, horaires et lieu sont les seules informations
    inventées du projet — le reste vient de la concession. */
 export const EVENT = {
-  label: "Ventes privées Ampère Autopassion",
+  label: "Ventes privées Amplitude Automobiles",
   dates: "Vendredi 13 et samedi 14 novembre 2026",
   jours: ["Vendredi 13 novembre", "Samedi 14 novembre"],
   horaires: "Vendredi 9h – 19h · Samedi 9h – 18h",

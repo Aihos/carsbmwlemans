@@ -49,7 +49,7 @@ const PER_PAGE = 12;
 export default function Catalogue() {
   usePageMeta(
     "Véhicules exposés aux ventes privées",
-    "Les BMW exposées pendant les ventes privées Ampère Autopassion au Mans : sportives BMW M, BMW i électriques et pièces BMW Classic. Prix, kilométrage et mensualités.",
+    "Les BMW exposées pendant les ventes privées Amplitude Automobiles au Mans : sportives BMW M, BMW i électriques et pièces BMW Classic. Prix, kilométrage et mensualités.",
   );
 
   const root = useRef<HTMLElement>(null);
@@ -122,7 +122,7 @@ export default function Catalogue() {
       {/* Chapeau : contexte en micro-capitales, propos en bas de casse */}
       <div className="mx-auto max-w-[1600px] px-5 pt-10 md:px-10 md:pt-16">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink/50">
-          Véhicules exposés · Ventes privées Ampère Autopassion, Le Mans
+          Véhicules exposés · Ventes privées Amplitude Automobiles, Le Mans
         </p>
         <h1 className="mt-3 max-w-4xl text-[28px] leading-[1.15] text-ink md:text-[36px]">
           {CATALOGUE.length} BMW exposées pendant les ventes privées
