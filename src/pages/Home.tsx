@@ -13,8 +13,8 @@ import BandeauCOnfigurateurMini from "../components/bandeauCOnfigurateurmini";
    (même code, même popup de rendez-vous). */
 export default function Home({ ready }: { ready: boolean }) {
   usePageMeta(
-    "Concession BMW au Mans, Le plaisir de conduire",
-    "BMW Ampère Autopassion, concession BMW au Mans : gamme BMW M, BMW i et BMW Classic, configurateur, essais et prise de rendez-vous en ligne.",
+    "Ventes privées BMW au Mans",
+    "Ventes privées BMW Ampère Autopassion, au Mans : deux jours sur invitation, véhicules exposés, essais sur créneau, reprise bonifiée et financement étudié en concession.",
   );
 
   return (

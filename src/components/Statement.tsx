@@ -57,11 +57,11 @@ export default function Statement() {
           </div>
 
           <div className="stmt-meta max-w-xs md:pb-6 md:text-right">
-            <p className="text-[11px] leading-relaxed text-white/75 md:text-xs">
+            <p className="text-[15px] leading-relaxed text-white/75 md:text-base">
               « Freude am Fahren » : le plaisir de conduire, la devise de BMW depuis Munich. Celle
               qui a mené la BMW V12 LMR à la victoire aux 24 Heures du Mans en 1999. Sportives de la
-              gamme M, BMW i électriques et pièces BMW Classic : tout est préparé par les ateliers
-              de la concession.
+              gamme M, BMW i électriques et pièces BMW Classic : tout est préparé par les ateliers de
+              la concession pour les ventes privées.
             </p>
             <a
               href="#configurateur"

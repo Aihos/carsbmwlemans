@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import SmartLink from "../components/SmartLink";
 import {
   CARS,
@@ -36,16 +36,21 @@ const norm = (v: string) =>
 
 const km = (n: number) => (n === 0 ? "0 km" : `${n.toLocaleString("fr-FR")} km`);
 
+/** Nombre de véhicules affichés par page dans la grille du catalogue. */
+const PER_PAGE = 12;
+
 export default function Catalogue() {
   usePageMeta(
-    "Catalogue BMW",
-    "Les BMW disponibles en concession au Mans : sportives BMW M, BMW i électriques et pièces BMW Classic. Prix, kilométrage et mensualités.",
+    "Véhicules exposés aux ventes privées",
+    "Les BMW exposées pendant les ventes privées Ampère Autopassion au Mans : sportives BMW M, BMW i électriques et pièces BMW Classic. Prix, kilométrage et mensualités.",
   );
 
   const root = useRef<HTMLElement>(null);
   const [family, setFamily] = useState<"Tout" | Family>("Tout");
   const [sort, setSort] = useState(SORTS[0].id);
   const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const pageTop = useRef<HTMLDivElement>(null);
 
   const list = useMemo(() => {
     const q = norm(query.trim());
@@ -62,7 +67,22 @@ export default function Catalogue() {
     return sorted;
   }, [family, sort, query]);
 
-  const signature = `${family}|${sort}|${query}|${list.length}`;
+  const pageCount = Math.max(1, Math.ceil(list.length / PER_PAGE));
+  const current = Math.min(page, pageCount);
+  const paged = list.slice((current - 1) * PER_PAGE, current * PER_PAGE);
+
+  /* Tout changement de filtre ramène à la première page. */
+  useEffect(() => setPage(1), [family, sort, query]);
+
+  /* Changer de page remonte à la grille, pas au bas de la liste. */
+  const goTo = (n: number) => {
+    setPage(Math.min(Math.max(n, 1), pageCount));
+    requestAnimationFrame(() =>
+      pageTop.current?.scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "start" }),
+    );
+  };
+
+  const signature = `${family}|${sort}|${query}|${current}`;
 
   useGSAP(
     () => {
@@ -95,19 +115,19 @@ export default function Catalogue() {
       {/* Chapeau : contexte en micro-capitales, propos en bas de casse */}
       <div className="mx-auto max-w-[1600px] px-5 pt-10 md:px-10 md:pt-16">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink/50">
-          Catalogue BMW · Ampère Autopassion, Le Mans
+          Véhicules exposés · Ventes privées Ampère Autopassion, Le Mans
         </p>
         <h1 className="mt-3 max-w-4xl text-[28px] leading-[1.15] text-ink md:text-[36px]">
-          {CATALOGUE.length} BMW disponibles en concession
+          {CATALOGUE.length} BMW exposées pendant les ventes privées
         </h1>
-        <p className="mt-4 max-w-2xl text-[13px] leading-relaxed text-ink/60">
-          Chaque véhicule est contrôlé et préparé par nos ateliers. Réservez votre essai : nous
-          préparons la BMW choisie avant votre arrivée.
+        <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-ink/60 md:text-base">
+          Chaque véhicule est contrôlé et préparé par nos ateliers. Réservez votre créneau : la BMW
+          choisie vous attend, prête, à votre arrivée.
         </p>
       </div>
 
       {/* Barre d'outils : chrome monochrome, filets fins, rien de plus */}
-      <div className="sticky top-0 z-30 mt-8 border-b border-line backdrop-blur-md md:mt-12">
+      <div className="sticky top-0 z-30 mt-8 border-b border-line bg-page md:mt-12">
         <div className="mx-auto flex max-w-[1600px] flex-col gap-4 px-5 md:px-10 lg:flex-row lg:items-end lg:justify-between">
           <div
             className="no-scrollbar flex items-end gap-7 overflow-x-auto"
@@ -166,7 +186,10 @@ export default function Catalogue() {
       </div>
 
       {/* Résultat de la recherche en cours */}
-      <div className="mx-auto flex max-w-[1600px] flex-wrap items-center gap-3 px-5 pt-6 md:px-10 md:pt-8">
+      <div
+        ref={pageTop}
+        className="mx-auto flex max-w-[1600px] scroll-mt-28 flex-wrap items-center gap-3 px-5 pt-6 md:px-10 md:pt-8"
+      >
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink/50">
           {list.length} {list.length > 1 ? "véhicules" : "véhicule"}
         </p>
@@ -187,9 +210,9 @@ export default function Catalogue() {
         {list.length === 0 ? (
           <div className="border-t border-line py-20 text-center">
             <p className="text-[22px] text-ink md:text-[26px]">Aucun véhicule ne correspond</p>
-            <p className="mx-auto mt-3 max-w-md text-[12px] leading-relaxed text-ink/55">
-              Élargissez la recherche, ou confiez-nous votre recherche : nous trouvons votre BMW
-              dans le réseau de la marque.
+            <p className="mx-auto mt-3 max-w-md text-[14px] leading-relaxed text-ink/55 md:text-[15px]">
+              Élargissez la recherche, ou confiez-nous la vôtre : nous trouvons la BMW qui vous
+              intéresse dans le réseau de la marque, pour un essai pendant l'événement.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <button
@@ -209,7 +232,7 @@ export default function Catalogue() {
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {list.map((c) => {
+            {paged.map((c) => {
               const configurable = CARS.some((car) => car.id === c.id);
               return (
                 <article
@@ -248,12 +271,12 @@ export default function Catalogue() {
                     <h2 className="mt-4 text-[20px] leading-tight text-ink md:text-[22px]">
                       {c.name}
                     </h2>
-                    <p className="mt-1.5 text-[11px] leading-snug text-ink/50">{c.motorisation}</p>
+                    <p className="mt-1.5 text-[13px] leading-snug text-ink/50">{c.motorisation}</p>
 
-                    <p className="mt-3.5 text-[13px] text-ink/55">
+                    <p className="mt-3.5 text-[14px] text-ink/55">
                       À partir de {EUR2(c.monthly)} / mois
                     </p>
-                    <p className="mt-1 text-[11px] leading-snug text-ink/45">
+                    <p className="mt-1 text-[12px] leading-snug text-ink/45">
                       {c.year} · {km(c.km)} · {c.energy} · {c.gearbox} · {EUR(c.price)}
                     </p>
 
@@ -266,13 +289,13 @@ export default function Catalogue() {
                         }
                         className="block bg-ink py-3.5 text-center text-[11px] font-bold uppercase tracking-[0.18em] text-white transition-colors hover:bg-brand"
                       >
-                        {configurable ? "Découvrez-la" : "Réserver un essai"}
+                        {configurable ? "Découvrez-la" : "Réserver ce créneau"}
                       </SmartLink>
                       <SmartLink
                         to={`/?vehicule=${encodeURIComponent(c.name)}#reservation`}
-                        className="mx-auto mt-3 block w-fit text-center text-[11px] text-ink/50 underline underline-offset-4 transition-colors hover:text-ink"
+                        className="mx-auto mt-3 block w-fit text-center text-[12px] text-ink/50 underline underline-offset-4 transition-colors hover:text-ink"
                       >
-                        Demander un devis
+                        Demander le tarif privé
                       </SmartLink>
                     </div>
                   </div>
@@ -282,6 +305,52 @@ export default function Catalogue() {
           </div>
         )}
       </div>
+
+      {/* Pagination : la grille ne déroule plus les 74 fiches d'un seul tenant */}
+      {pageCount > 1 && (
+        <nav
+          aria-label="Pagination du catalogue"
+          className="mx-auto mt-12 flex max-w-[1600px] flex-wrap items-center justify-center gap-2 px-5 md:mt-16 md:px-10"
+        >
+          <button
+            type="button"
+            onClick={() => goTo(current - 1)}
+            disabled={current === 1}
+            aria-label="Page précédente"
+            className="flex h-11 w-11 items-center justify-center border border-line text-[18px] text-ink transition-colors hover:border-ink disabled:opacity-30 disabled:hover:border-line"
+          >
+            <span aria-hidden="true">‹</span>
+          </button>
+
+          {Array.from({ length: pageCount }, (_, i) => i + 1).map((n) => (
+            <button
+              key={n}
+              type="button"
+              onClick={() => goTo(n)}
+              aria-current={n === current ? "page" : undefined}
+              aria-label={`Page ${n} sur ${pageCount}`}
+              className={`flex h-11 w-11 items-center justify-center text-[13px] tabular-nums transition-colors ${
+                n === current
+                  ? "bg-ink text-white"
+                  : "border border-line text-ink/70 hover:border-ink hover:text-ink"
+              }`}
+            >
+              {n}
+            </button>
+          ))}
+
+          <button
+            type="button"
+            onClick={() => goTo(current + 1)}
+            disabled={current === pageCount}
+            aria-label="Page suivante"
+            className="flex h-11 w-11 items-center justify-center border border-line text-[18px] text-ink transition-colors hover:border-ink disabled:opacity-30 disabled:hover:border-line"
+          >
+            <span aria-hidden="true">›</span>
+          </button>
+        </nav>
+      )}
     </section>
   );
 }
+

@@ -231,6 +231,21 @@ export const EUR2 = (n: number) =>
     maximumFractionDigits: 2,
   }).format(n);
 
+/* ─────────────────────────── Ventes privées ───────────────────────────
+
+   L'événement que porte tout le site. Changer ces valeurs ici les change
+   partout : le hero, la popup de rendez-vous, la galerie et le pied de page
+   lisent cet objet. Dates, horaires et lieu sont les seules informations
+   inventées du projet — le reste vient de la concession. */
+export const EVENT = {
+  label: "Ventes privées Ampère Autopassion",
+  dates: "Vendredi 13 et samedi 14 novembre 2026",
+  jours: ["Vendredi 13 novembre", "Samedi 14 novembre"],
+  horaires: "Vendredi 9h – 19h · Samedi 9h – 18h",
+  lieu: "2 boulevard René Cassin, 72016 Le Mans",
+  invitation: "Sur invitation",
+};
+
 /* Navigation principale, routes réelles (react-router) */
 export const NAV = [
   { label: "Catalogue", to: "/catalogue" },
@@ -309,10 +324,10 @@ export const NEWS: News[] = [
   {
     id: "skytop",
     category: "BMW M",
-    date: "2026-10-03",
-    title: "BMW Skytop, la série limitée la plus rare de la gamme",
+    date: "2026-11-12",
+    title: "La Skytop sera exposée pendant les ventes privées",
     excerpt:
-      "Cinquante exemplaires, un V8 de 625 ch et une silhouette qui cite la 507 de 1957. La Skytop est l'objet le plus exclusif jamais produit par la M. Nous vous accompagnons pour constituer votre dossier.",
+      "Cinquante exemplaires dans le monde, un V8 de 625 ch et une silhouette qui cite la 507 de 1957. L'objet le plus rare jamais produit par la M sera au showroom pendant les deux jours, sur rendez-vous.",
     img: "/img/troisquart/BMW-Skytop-2025-Rear_Three-Quarter.60c0a162.webp",
     alt: "BMW Skytop, trois-quarts arrière",
     to: "/catalogue",
@@ -320,10 +335,10 @@ export const NEWS: News[] = [
   {
     id: "vision-m-next",
     category: "Innovation",
-    date: "2026-09-30",
-    title: "Vision M Next : ce que la M prépare pour demain",
+    date: "2026-11-08",
+    title: "Vision M Next : le concept à voir pendant l'événement",
     excerpt:
-      "Hybridation, transmission intégrale et plus de 600 ch : le concept qui annonce l'électrification de la gamme M sans renoncer au plaisir de conduire. Les premiers essais presse sont programmés cette saison.",
+      "Hybridation, transmission intégrale et plus de 600 ch : le concept qui annonce l'électrification de la gamme M sans renoncer au plaisir de conduire. Il reste exposé pendant les deux jours.",
     img: "/img/troisquart/BMW-Vision_M_Next_Concept-2019-wallpaper.webp",
     alt: "BMW Vision M Next, concept",
     to: "/catalogue",
@@ -331,10 +346,10 @@ export const NEWS: News[] = [
   {
     id: "classic-503",
     category: "BMW Classic",
-    date: "2026-09-26",
-    title: "Nos ateliers remettent en route une 503 Coupé de 1956",
+    date: "2026-11-04",
+    title: "La 503 Coupé de 1956 sort d'atelier pour les ventes privées",
     excerpt:
-      "Douze mois de travail, un V8 d'origine reconstruit pièce par pièce et une première sortie sur les routes de la Sarthe. La restauration de la 503 est visible en atelier, sur rendez-vous.",
+      "Douze mois de restauration, un V8 d'origine reconstruit pièce par pièce et une première sortie sur les routes de la Sarthe. La 503 se visite à l'atelier, sur rendez-vous, pendant l'événement.",
     img: "/img/BMW-503_Coupe-1956-Side_Profile.83b9c17e.webp",
     alt: "BMW 503 Coupé 1956, profil",
     to: "/catalogue",
@@ -342,10 +357,10 @@ export const NEWS: News[] = [
   {
     id: "ix5",
     category: "BMW i",
-    date: "2026-09-22",
-    title: "BMW iX5 : la nouvelle génération électrique se précise",
+    date: "2026-10-31",
+    title: "iX5 : les précommandes s'ouvrent pendant l'événement",
     excerpt:
-      "620 km d'autonomie annoncés, recharge à 350 kW et dernière génération de cellules : le iX5 ouvre la voie aux BMW i de demain. Précommandes ouvertes en concession.",
+      "620 km d'autonomie annoncés, recharge à 350 kW et dernière génération de cellules : le iX5 ouvre la voie aux BMW i de demain. Les précommandes se prennent en concession pendant les deux jours.",
     img: "/img/BMW-iX5-2027-Side_Profile.5ae9ad71.webp",
     alt: "BMW iX5, profil",
     to: "/catalogue",
@@ -353,10 +368,10 @@ export const NEWS: News[] = [
   {
     id: "serie7",
     category: "Gamme",
-    date: "2026-09-18",
-    title: "Série 7 : le vaisseau amiral arrive en concession",
+    date: "2026-10-27",
+    title: "Série 7 : le vaisseau amiral exposé au showroom",
     excerpt:
-      "Six cylindres, suspension pneumatique et banquette arrière façon salon : la Série 7 est exposée en showroom et disponible à l'essai sur rendez-vous.",
+      "Six cylindres, suspension pneumatique et banquette arrière façon salon : la Série 7 figure dans la sélection des ventes privées et reste disponible à l'essai sur créneau.",
     img: "/img/troisquart/BMW-7-Series-2027-wallpaper.webp",
     alt: "BMW Série 7, trois-quarts avant",
     to: "/catalogue",
@@ -364,10 +379,10 @@ export const NEWS: News[] = [
   {
     id: "m2",
     category: "BMW M",
-    date: "2026-09-12",
-    title: "BMW M2 : six cylindres, 480 ch et boîte manuelle au catalogue",
+    date: "2026-10-23",
+    title: "BMW M2 : 480 ch, et un essai encadré sur les routes de la Sarthe",
     excerpt:
-      "La M2 reste la plus compacte des BMW M, et la plus joueuse. Notre exemplaire de démonstration est disponible pour un essai encadré sur les routes de la Sarthe.",
+      "La M2 reste la plus compacte des BMW M, et la plus joueuse. Notre exemplaire de démonstration se conduit pendant l'événement, essai encadré, sur créneau réservé.",
     img: "/img/troisquart/BMW-M2-2025-wallpaper.webp",
     alt: "BMW M2, trois-quarts",
     to: "/configurateur?modele=bmw-m2-m-xdrive",
@@ -375,10 +390,10 @@ export const NEWS: News[] = [
   {
     id: "news-i5",
     category: "BMW i",
-    date: "2026-09-08",
-    title: "i5 eDrive40 : 582 km WLTP, l'essai libre est ouvert",
+    date: "2026-10-19",
+    title: "i5 eDrive40 : 582 km WLTP, essai libre pendant l'événement",
     excerpt:
-      "Berline électrique, 340 ch et recharge rapide : l'i5 eDrive40 est en essai libre en concession. Une heure au volant suffit à comprendre où va la marque.",
+      "Berline électrique, 340 ch et recharge rapide : l'i5 eDrive40 est dans la sélection exposée. Une heure au volant suffit à comprendre où va la marque.",
     img: "/img/BMW-i5-2024-Side_Profile.17799284.webp",
     alt: "BMW i5 eDrive40, profil",
     to: "/catalogue",
@@ -386,10 +401,10 @@ export const NEWS: News[] = [
   {
     id: "news-ix2",
     category: "BMW i",
-    date: "2026-09-04",
-    title: "iX2 xDrive30 : un 0 km démonstration rejoint notre stock",
+    date: "2026-10-15",
+    title: "iX2 xDrive30 : un 0 km démonstration rejoint la vente privée",
     excerpt:
-      "4 200 km au compteur, électrique, toutes options : le iX2 xDrive30 est le compromis le plus malin du moment. Financement et reprise étudiés sur place.",
+      "4 200 km au compteur, électrique, toutes options : le iX2 xDrive30 fait partie des véhicules repris en conditions privées pendant les deux jours. Financement et reprise étudiés sur place.",
     img: "/img/BMW-iX2-2024-Side_Profile.e5efc40a.webp",
     alt: "BMW iX2 xDrive30, profil",
     to: "/catalogue",
@@ -397,10 +412,10 @@ export const NEWS: News[] = [
   {
     id: "news-e30",
     category: "BMW Classic",
-    date: "2026-08-30",
-    title: "Une 325i cabriolet de 1990 entre en collection",
+    date: "2026-10-11",
+    title: "Une 325i cabriolet de 1990 entre en collection pour l'événement",
     excerpt:
-      "Cent vingt et un mille kilomètres, un six cylindres en ligne et une capote d'origine : cette E30 rejoint les pièces BMW Classic suivies par nos ateliers.",
+      "Cent vingt et un mille kilomètres, un six cylindres en ligne et une capote d'origine : cette E30 rejoint les pièces BMW Classic suivies par nos ateliers et sera exposée le week-end.",
     img: "/img/c.webp",
     alt: "BMW 325i cabriolet de 1990",
     to: "/catalogue",
@@ -408,10 +423,10 @@ export const NEWS: News[] = [
   {
     id: "news-i8",
     category: "Innovation",
-    date: "2026-08-24",
-    title: "BMW i8 : retour sur l'hybride qui a ouvert la voie",
+    date: "2026-10-07",
+    title: "i8 : l'hybride qui a ouvert la voie, exposée à l'atelier",
     excerpt:
-      "Châssis carbone, trois cylindres suralimenté et moteur électrique : dix ans après, l'i8 reste la démonstration la plus élégante du savoir-faire BMW i.",
+      "Châssis carbone, trois cylindres suralimenté et moteur électrique : dix ans après, l'i8 reste la démonstration la plus élégante du savoir-faire BMW i, visible pendant les ventes privées.",
     img: "/img/b%20(2).webp",
     alt: "BMW i8, profil",
     to: "/catalogue",
@@ -419,10 +434,10 @@ export const NEWS: News[] = [
   {
     id: "news-z8",
     category: "BMW Classic",
-    date: "2026-08-18",
-    title: "Z8 : le roadster qui prolonge la 507 dans notre showroom",
+    date: "2026-10-04",
+    title: "Z8 : le roadster qui prolonge la 507, à voir sur rendez-vous",
     excerpt:
-      "Un V8 atmosphérique, une ligne signée par les ateliers de design et une cote qui ne faiblit pas. Le Z8 est visible sur rendez-vous, entretien complet effectué.",
+      "Un V8 atmosphérique, une ligne signée par les ateliers de design et une cote qui ne faiblit pas. Le Z8 est visible pendant l'événement, entretien complet effectué.",
     img: "/img/A.webp",
     alt: "BMW Z8, profil",
     to: "/catalogue",
@@ -430,10 +445,10 @@ export const NEWS: News[] = [
   {
     id: "news-serie4",
     category: "Gamme",
-    date: "2026-08-11",
-    title: "Série 4 Coupé : finition M Sport et jantes M au catalogue",
+    date: "2026-10-02",
+    title: "Série 4 Coupé : finition M Sport dans la sélection exposée",
     excerpt:
-      "Le coupé en finition M Sport, avec ses jantes M et son châssis raffermi, est la porte d'entrée la plus directe vers la grammaire de la gamme M.",
+      "Le coupé en finition M Sport, avec ses jantes M et son châssis raffermi, est la porte d'entrée la plus directe vers la grammaire de la gamme M. Il fait partie des véhicules repris en tarif privé.",
     img: "/img/e.webp",
     alt: "BMW Série 4 Coupé, profil",
     to: "/catalogue",

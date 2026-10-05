@@ -24,8 +24,8 @@ const jour = (iso: string) => {
 
 export default function ActualitesPage() {
   usePageMeta(
-    "Actualités BMW",
-    "Les actualités de la concession BMW Ampère Autopassion au Mans : nouveautés de la gamme, BMW M, BMW i, BMW Classic, atelier et vie de la concession.",
+    "Actualités des ventes privées BMW",
+    "Ce que la concession BMW Ampère Autopassion prépare pour ses ventes privées au Mans : véhicules exposés, BMW M, BMW i, BMW Classic, atelier et reprises.",
   );
 
   const root = useRef<HTMLElement>(null);
@@ -68,15 +68,15 @@ export default function ActualitesPage() {
       {/* Chapeau */}
       <div className="mx-auto max-w-[1600px] px-5 pt-10 md:px-10 md:pt-16">
         <p className="text-[11px] uppercase tracking-[0.14em] text-ink/50">
-          Actualités · Ampère Autopassion, Le Mans
+          Actualités · Ventes privées, Ampère Autopassion Le Mans
         </p>
         <h1 className="mt-3 max-w-4xl text-[28px] leading-[1.15] text-ink md:text-[36px]">
-          Les actualités de la concession et de la marque
+          Ce qui se prépare pour les ventes privées
         </h1>
       </div>
 
       {/* Barre de filtres : chrome monochrome, filets fins, rien de plus */}
-      <div className="sticky top-0 z-30 mt-8 border-b border-line bg-page/85 backdrop-blur-md md:mt-12">
+      <div className="sticky top-0 z-30 mt-8 border-b border-line bg-page md:mt-12">
         <div className="mx-auto flex max-w-[1600px] flex-col gap-3 px-5 md:px-10 lg:flex-row lg:items-end lg:justify-between">
           <div
             className="no-scrollbar flex items-end gap-7 overflow-x-auto"
@@ -175,7 +175,7 @@ export default function ActualitesPage() {
                   <span className="mt-2.5 block text-[18px] font-bold leading-[1.25] text-ink">
                     {n.title}
                   </span>
-                  <span className="mt-2.5 block text-[12px] leading-relaxed text-ink/55">
+                  <span className="mt-2.5 block text-[14px] leading-relaxed text-ink/55 md:text-[15px]">
                     {n.excerpt}
                   </span>
                   <span className="mt-4 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-ink/55 transition-colors group-hover:text-brand">
@@ -205,14 +205,14 @@ export default function ActualitesPage() {
           />
           <div className="relative z-10 max-w-xl px-6 py-12 md:px-14 md:py-16">
             <p className="text-[10px] uppercase tracking-[0.28em] text-white/55">
-              Atelier de configuration
+              Avant les ventes privées
             </p>
             <h2 className="mt-3 font-display text-[clamp(1.6rem,3.4vw,2.6rem)] font-bold uppercase leading-[1.06] text-white">
-              Composez votre BMW
+              Préparez votre BMW
             </h2>
-            <p className="mt-4 text-[12px] leading-relaxed text-white/70">
-              Teinte extérieure, jantes et motorisation : composez votre BMW et transmettez votre
-              configuration à la concession.
+            <p className="mt-4 text-[14px] leading-relaxed text-white/70 md:text-[15px]">
+              Teinte extérieure, jantes et motorisation : composez la BMW que vous essaierez pendant
+              les ventes privées, la concession la prépare avant votre créneau.
             </p>
             <SmartLink
               to="/configurateur"

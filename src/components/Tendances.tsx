@@ -151,18 +151,18 @@ export default function Tendances() {
           className="font-display text-[clamp(2.4rem,7.4vw,6rem)] font-bold uppercase leading-[1.06] tracking-[-0.01em] text-ink"
         >
           <span className="mask-line">
-            <span>Nos</span>
+            <span>Ventes</span>
           </span>
           <span className="mask-line">
-            <span>Modèles</span>
+            <span>privées</span>
           </span>
         </h2>
 
         <div className="mt-4 flex items-end justify-between gap-6">
-          <p className="max-w-sm text-[11px] leading-relaxed text-ink/60 md:text-xs">
-            Sportives BMW M, BMW i électriques, pièces BMW Classic : chaque modèle passe entre les
-            mains de nos ateliers et part avec sa garantie constructeur. Essai sur route sans
-            engagement, reprise de votre BMW et financement étudié en concession.
+          <p className="max-w-sm text-[15px] leading-relaxed text-ink/60 md:text-base">
+            Deux jours, une sélection arrêtée à l'avance et des conditions qui ne sont pas reprises
+            ensuite. Essai sur route sur créneau réservé, reprise bonifiée de votre BMW et
+            financement étudié en concession pendant l'événement.
           </p>
           <div className=" flex flex-col gap-4 items-end">
           <span className="hidden shrink-0 font-display text-sm tabular-nums text-ink/40 md:block">
@@ -173,7 +173,7 @@ export default function Tendances() {
           to="/catalogue"
           className="inline-flex items-center gap-3 border border-line px-8 py-4 text-[11px] uppercase tracking-[0.16em] text-ink transition-colors hover:border-ink"
         >
-          Voir tous nos modèles
+          Voir tous les véhicules exposés
         </SmartLink>
       </div>
           </div>
@@ -229,7 +229,7 @@ export default function Tendances() {
                     {c.name}
                   </h3>
                   <div className="mt-2 flex items-end justify-between gap-4">
-                    <p className="text-[11px] text-ink/55">À partir de {EUR2(c.monthly)} / mois</p>
+                    <p className="text-[12px] text-ink/55">À partir de {EUR2(c.monthly)} / mois</p>
                     <span className="shrink-0 font-display text-[1.35rem] leading-none text-ink">
                       {EUR(c.price)}
                     </span>
@@ -240,7 +240,7 @@ export default function Tendances() {
                   to={`/?vehicule=${encodeURIComponent(c.name)}#reservation`}
                   className="block bg-ink py-3.5 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-white transition-colors hover:bg-brand"
                 >
-                  Réserver un essai
+                  Réserver ce créneau
                 </SmartLink>
               </article>
             ))}
@@ -252,7 +252,7 @@ export default function Tendances() {
             type="button"
             onClick={() => go(-1)}
             disabled={index === 0}
-            aria-label="Modèles précédents"
+            aria-label="Véhicules précédents"
             className="flex h-12 w-12 items-center justify-center bg-ink text-white transition-all hover:bg-brand disabled:opacity-30"
           >
             <span aria-hidden="true">◀</span>
@@ -261,7 +261,7 @@ export default function Tendances() {
             type="button"
             onClick={() => go(1)}
             disabled={index >= maxIndex}
-            aria-label="Modèles suivants"
+            aria-label="Véhicules suivants"
             className="flex h-12 w-12 items-center justify-center bg-ink text-white transition-all hover:bg-brand disabled:opacity-30"
           >
             <span aria-hidden="true">▶</span>

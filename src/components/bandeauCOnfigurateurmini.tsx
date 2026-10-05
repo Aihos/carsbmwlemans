@@ -23,14 +23,15 @@ export default function BandeauCOnfigurateurMini() {
 
         <div className="relative z-10 max-w-xl px-6 py-14 md:px-14 md:py-20">
           <p className="text-[10px] uppercase tracking-[0.28em] text-white/55">
-            Atelier de configuration
+            Avant les ventes privées
           </p>
           <h2 className="mt-3 font-display text-[clamp(1.6rem,3.4vw,2.6rem)] font-bold uppercase leading-[1.06] text-white">
-            Composez votre BMW
+            Préparez votre BMW
           </h2>
-          <p className="mt-4 text-[12px] leading-relaxed text-white/70">
-            Teinte extérieure, jantes, motorisation, sellerie et accessoires : composez votre BMW et
-            transmettez votre configuration à la concession.
+          <p className="mt-4 text-[14px] leading-relaxed text-white/70 md:text-[15px]">
+            Teinte extérieure, jantes, motorisation, sellerie et accessoires : composez la BMW que
+            vous essaierez pendant les ventes privées, votre configuration est transmise à la
+            concession avant votre créneau.
           </p>
           <SmartLink
             to="/configurateur"

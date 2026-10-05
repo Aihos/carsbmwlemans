@@ -1,6 +1,6 @@
 import SmartLink from "./SmartLink";
 import { useReservation } from "../lib/reservation";
-import { ROUNDEL } from "../data/site";
+import { EVENT, ROUNDEL } from "../data/site";
 
 /* Pied de page.
    Bande de marque + appel à l'action, puis les quatre groupes de navigation,
@@ -24,7 +24,7 @@ const COLS: { title: string; links: { label: string; to?: string; action?: "cont
     title: "La gamme",
     links: [
       { label: "Catalogue", to: "/catalogue" },
-      { label: "Nos modèles", to: "/#tendances" },
+      { label: "Ventes privées", to: "/#tendances" },
       { label: "Galerie", to: "/#galerie" },
       { label: "Configurateur", to: "/configurateur" },
     ],
@@ -33,15 +33,15 @@ const COLS: { title: string; links: { label: string; to?: string; action?: "cont
     title: "Acheter",
     links: [
       { label: "Composer ma BMW", to: "/configurateur" },
-      { label: "Véhicules en stock", to: "/catalogue" },
-      { label: "Financement & LOA", to: "/#reservation" },
-      { label: "Reprise de votre BMW", to: "/#reservation" },
+      { label: "Véhicules exposés", to: "/catalogue" },
+      { label: "Financement de l'événement", to: "/#reservation" },
+      { label: "Reprise bonifiée de votre BMW", to: "/#reservation" },
     ],
   },
   {
     title: "Concession",
     links: [
-      { label: "Prendre rendez-vous", to: "/#reservation" },
+      { label: "Réserver mon créneau", to: "/#reservation" },
       { label: "Horaires", to: "/#horaires" },
       { label: "Nous contacter", action: "contact" },
       { label: "Retour à l'accueil", to: "/" },
@@ -111,22 +111,22 @@ export default function Footer() {
                 </span>
               </span>
             </div>
-            <p className="mt-6 max-w-sm text-[13px] leading-relaxed text-white/70">
-              Concession BMW au Mans : véhicules neufs, occasions BMW Premium Selection et pièces
-              BMW Classic. Le plaisir de conduire, à deux pas du circuit de la Sarthe.
+            <p className="mt-6 max-w-sm text-[15px] leading-relaxed text-white/70 md:text-base">
+              {EVENT.dates} : {EVENT.label}, concession BMW au Mans. Véhicules exposés, reprises
+              bonifiées, essais sur créneau réservé.
             </p>
           </div>
 
           <div className="lg:text-right">
-            <p className="text-[13px] leading-relaxed text-white/70">
-              Votre prochaine BMW se choisit au volant.
+            <p className="text-[15px] leading-relaxed text-white/70 md:text-base">
+              Votre créneau se réserve maintenant.
             </p>
             <button
               type="button"
               onClick={() => reservation?.open()}
               className="mt-5 inline-flex items-center gap-3 bg-brand px-7 py-3.5 text-[11px] uppercase tracking-[0.16em] text-white transition-colors hover:bg-navy"
             >
-              Réserver un essai
+              Réserver mon créneau
               <span aria-hidden="true">→</span>
             </button>
             <p className="mt-5">
@@ -148,7 +148,7 @@ export default function Footer() {
               <ul className="mt-5 space-y-3">
                 {c.links.map((l) => {
                   const cls =
-                    "group inline-flex items-center gap-2 text-[13px] text-white/80 transition-colors hover:text-white";
+                    "group inline-flex items-center gap-2 text-[14px] text-white/80 transition-colors hover:text-white";
                   return (
                     <li key={l.label}>
                       {l.action === "contact" ? (
@@ -172,7 +172,7 @@ export default function Footer() {
           {/* Coordonnées et horaires (ancre #horaires utilisée par le menu) */}
           <div id="horaires">
             <h2 className="text-[10px] uppercase tracking-[0.2em] text-white/45">Nous joindre</h2>
-            <ul className="mt-5 space-y-3 text-[13px] text-white/80">
+            <ul className="mt-5 space-y-3 text-[14px] text-white/80">
               <li>
                 <a href={TEL_HREF} className="transition-colors hover:text-white md:text-[15px]">
                   {TEL}
@@ -212,7 +212,7 @@ export default function Footer() {
               </li>
             ))}
           </ul>
-          <p className="max-w-2xl text-[11px] leading-relaxed text-white/50 lg:text-right">
+          <p className="max-w-2xl text-[13px] leading-relaxed text-white/50 lg:text-right">
             Pour les trajets courts, privilégiez la marche ou le vélo. Pensez à covoiturer. Au
             quotidien, prenez les transports en commun. #SeDéplacerMoinsPolluer
           </p>

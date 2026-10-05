@@ -148,9 +148,9 @@ export default function ConfigurateurComposer({
         {/* Bandeau haut : titre + choix du modèle */}
         <div className="cfg-in flex shrink-0 flex-wrap items-end justify-between gap-x-8 gap-y-2">
           <div>
-            <p className={micro}>Atelier de configuration</p>
+            <p className={micro}>Avant les ventes privées</p>
             <h1 className="mt-1 font-display text-[clamp(1.35rem,2.4vw,2.1rem)] font-black uppercase leading-[1.06] text-ink">
-              Configurez votre BMW
+              Configurez la BMW de votre essai
             </h1>
           </div>
 
@@ -509,7 +509,7 @@ export default function ConfigurateurComposer({
                 onClick={() => setOpen(true)}
                 className="group inline-flex items-center gap-3 bg-brand px-7 py-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition-colors hover:bg-navy"
               >
-                Réserver mon essai
+                Réserver mon créneau
                 <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
               </button>
             </div>

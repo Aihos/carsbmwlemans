@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap, useGSAP, reduced } from "../lib/anim";
 import SmartLink from "./SmartLink";
 import { NEWS_HIGHLIGHT as NEWS } from "../data/site";
@@ -12,11 +12,25 @@ import { NEWS_HIGHLIGHT as NEWS } from "../data/site";
    d'opacité n'est posée sur ces couches — un `opacity: 1` inline écraserait la
    classe `opacity-0` des diapositives masquées et les ferait toutes apparaître
    l'une sur l'autre. */
+/** Durée d'affichage d'une actualité avant passage automatique à la suivante. */
+const AUTO_MS = 10000;
+
 export default function Actualites() {
   const root = useRef<HTMLElement>(null);
   const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
 
   const go = (step: number) => setIndex((i) => (i + step + NEWS.length) % NEWS.length);
+
+  /* Rotation automatique : une actualité toutes les 10 s. Mise en pause au
+     survol et au focus clavier, et coupée si l'utilisateur préfère les
+     animations réduites. L'index en dépendance relance le compte à rebours
+     après chaque changement, manuel comme automatique. */
+  useEffect(() => {
+    if (paused || reduced() || NEWS.length < 2) return;
+    const id = window.setInterval(() => setIndex((i) => (i + 1) % NEWS.length), AUTO_MS);
+    return () => window.clearInterval(id);
+  }, [paused, index]);
 
   useGSAP(
     () => {
@@ -54,7 +68,13 @@ export default function Actualites() {
           Actualités
         </p> */}
 
-        <div className="relative mt-8 md:mt-10 flex">
+        <div
+          className="relative mt-8 flex md:mt-10"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+          onFocus={() => setPaused(true)}
+          onBlur={() => setPaused(false)}
+        >
          
 
           {NEWS.map((n, i) => {
@@ -63,7 +83,7 @@ export default function Actualites() {
               <div
                 key={n.id}
                 aria-hidden={!active}
-                className={`grid items-center gap-8 transition-[opacity,transform] duration-500 ease-out md:grid-cols-[1fr_1.05fr] md:gap-14 lg:gap-20 ${
+                className={`grid items-center gap-8 transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] md:grid-cols-[1fr_1.05fr] md:gap-14 lg:gap-20 ${
                   active
                     ? "act-live relative translate-y-0 opacity-100"
                     : "pointer-events-none absolute inset-0 -translate-y-2 opacity-0"
@@ -94,7 +114,7 @@ export default function Actualites() {
                   <h2 className="mt-4 max-w-2xl text-[clamp(1.75rem,3.5vw,3rem)] font-extrabold uppercase leading-[1.04] tracking-[-0.01em] text-ink">
                     {n.title}
                   </h2>
-                  <p className="mt-6 max-w-xl text-[13px] leading-relaxed text-ink/70 md:text-[15px]">
+                  <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-ink/70 md:text-base">
                     {n.excerpt}
                   </p>
                   <SmartLink

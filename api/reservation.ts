@@ -125,20 +125,20 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     .join("\n");
 
   const text = [
-    "Nouvelle demande de rendez-vous — BMW Ampère Autopassion (Le Mans)",
+    "Nouvelle demande de créneau — Ventes privées BMW Ampère Autopassion (Le Mans)",
     "",
     details,
     "",
     message ? `Message :\n${message}` : "Message : —",
     "",
-    "— Concession BMW Ampère Autopassion, Le Mans · Le plaisir de conduire",
+    "— Ventes privées BMW Ampère Autopassion, Le Mans · 13 & 14 novembre 2026",
   ].join("\n");
 
   const html = `
     <div style="font-family:Helvetica,Arial,sans-serif;color:#06213f;line-height:1.6">
-      <h2 style="margin:0 0 4px;font-size:18px">Nouvelle demande de rendez-vous</h2>
+      <h2 style="margin:0 0 4px;font-size:18px">Nouvelle demande de créneau — ventes privées</h2>
       <p style="margin:0 0 18px;font-size:13px;color:#5a6b80">
-        Concession BMW · Ampère Autopassion, Le Mans
+        Ventes privées BMW · Ampère Autopassion, Le Mans · 13 &amp; 14 novembre 2026
       </p>
       <table cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:14px">
         ${rows
@@ -158,7 +158,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
           : ""
       }
       <p style="margin:24px 0 0;font-size:12px;color:#00559d">
-        Concession BMW Ampère Autopassion — Le Mans · Le plaisir de conduire
+        Ventes privées BMW Ampère Autopassion — Le Mans · 13 &amp; 14 novembre 2026
       </p>
       <p style="margin:24px 0 0;font-size:12px;color:#5a6b80">
         Répondre à ce mail écrit directement au client (${esc(email)}).
@@ -170,7 +170,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       from,
       to,
       replyTo: email,
-      subject: `Rendez-vous — ${vehicule || "véhicule à préciser"} · ${nom}`,
+      subject: `Créneau ventes privées — ${vehicule || "véhicule à préciser"} · ${nom}`,
       text,
       html,
     });

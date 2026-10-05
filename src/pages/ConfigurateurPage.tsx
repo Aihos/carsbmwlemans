@@ -5,8 +5,8 @@ import { usePageMeta } from "../lib/seo";
    monté dans la section #configurateur de la page d'accueil. */
 export default function ConfigurateurPage() {
   usePageMeta(
-    "Configurateur BMW",
-    "Composez votre BMW : couleur, jantes, motorisation. Envoyez votre configuration à la concession BMW du Mans pour un rendez-vous.",
+    "Configurateur BMW des ventes privées",
+    "Composez la BMW que vous essaierez pendant les ventes privées du Mans : teinte extérieure, jantes et motorisation, transmises à la concession avant votre créneau.",
   );
 
   return <ConfigurateurComposer variant="page" />;

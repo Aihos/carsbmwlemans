@@ -71,12 +71,12 @@ export default function Hero({ ready }: { ready: boolean }) {
 
       <div className="relative z-10 mx-auto mb-[8svh] flex w-full max-w-[1600px] flex-col items-center px-5 text-center md:px-10">
         <p className="mask-line font-sans text-[clamp(0.95rem,1.5vw,1.4rem)] font-light text-white/90">
-          <span className="hero-word inline-block">Ampère Autopassion · Le Mans</span>
+          <span className="hero-word inline-block">Ventes privées · 13 &amp; 14 novembre 2026</span>
         </p>
 
         <h1 className="mt-2 font-sans text-[clamp(1.5rem,3.7vw,3.4rem)] font-bold uppercase leading-[1.08] tracking-[0.005em] text-white">
           <span className="mask-line">
-            <span className="hero-word inline-block">Le plaisir de conduire</span>
+            <span className="hero-word inline-block">Sur invitation</span>
           </span>
         </h1>
 
@@ -86,13 +86,13 @@ export default function Hero({ ready }: { ready: boolean }) {
             onClick={() => reservation?.open()}
             className="hero-cta inline-flex items-center gap-3 bg-white px-7 py-3.5 text-[11px] font-bold tracking-[0.08em] text-ink transition-colors hover:bg-brand hover:text-white md:text-xs"
           >
-            Réserver un essai
+            Réserver mon créneau
           </button>
           <SmartLink
             to="/catalogue"
             className="hero-cta inline-flex items-center gap-3 border border-white/60 px-7 py-3.5 text-[11px] font-bold tracking-[0.08em] text-white backdrop-blur-[2px] transition-colors hover:bg-white hover:text-ink md:text-xs"
           >
-            Explorer la gamme BMW
+            Voir les véhicules exposés
           </SmartLink>
         </div>
       </div>

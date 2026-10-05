@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
-import { VEHICLES } from "../data/site";
+import { VEHICLES, EVENT } from "../data/site";
 
 type Status = "idle" | "sending" | "ok" | "error";
 
@@ -161,20 +161,20 @@ export default function ContactModal({
 
           <div className="relative z-10 w-full px-6 pb-7 pt-16 text-white md:px-10 md:pb-9">
             <p className={`${meta} text-white/70`}>
-              <span>{configured ? "Votre configuration" : "Concession BMW Le Mans"}</span>
+              <span>{configured ? "Votre configuration" : "Ventes privées BMW Le Mans"}</span>
               <span aria-hidden="true" className="h-px w-6 bg-white/40" />
-              <span>Le Mans</span>
+              <span>13 &amp; 14 novembre</span>
             </p>
             <h2
               id="contact-titre"
               className="mt-3 max-w-2xl font-display text-[clamp(1.55rem,3.4vw,2.5rem)] font-black uppercase leading-[1.06]"
             >
-              {configured ? `Essai ${vehicule}` : "Réserver votre essai"}
+              {configured ? `Essai ${vehicule}` : "Réserver votre créneau"}
             </h2>
-            <p className="mt-3 max-w-xl text-[12px] leading-relaxed text-white/75 md:text-[13px]">
+            <p className="mt-3 max-w-xl text-[14px] leading-relaxed text-white/75 md:text-[15px]">
               {configured
-                ? "Votre configuration est prête. Laissez-nous vos coordonnées : la concession vous rappelle pour votre essai sur ce modèle."
-                : "Essai sur route, reprise de votre BMW, financement : dites-nous ce qui vous intéresse et un conseiller vous fixe le créneau."}
+                ? "Votre configuration est prête. Laissez-nous vos coordonnées : la concession vous rappelle pour votre essai pendant les ventes privées."
+                : `${EVENT.dates} : la concession reçoit sur créneau. Dites-nous quel modèle vous voulez essayer, un conseiller vous fixe votre horaire.`}
             </p>
           </div>
         </div>
@@ -187,10 +187,10 @@ export default function ContactModal({
               <p className="mt-4 max-w-2xl font-display text-[clamp(1.4rem,2.8vw,2.1rem)] font-black uppercase leading-[1.06] text-ink">
                 Merci, nous nous occupons de la suite.
               </p>
-              <p className="mt-4 max-w-lg text-[13px] leading-relaxed text-ink/60">
+              <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-ink/60 md:text-base">
                 {configured
-                  ? `Votre configuration ${vehicule} est transmise à la concession. Nous vous recontactons très vite pour votre rendez-vous.`
-                  : "Votre demande de rendez-vous est transmise à la concession. Nous vous recontactons très vite pour confirmer votre créneau."}
+                  ? `Votre configuration ${vehicule} est transmise à la concession. Nous vous recontactons très vite pour votre rendez-vous pendant les ventes privées.`
+                  : "Votre demande de créneau est transmise à la concession. Nous vous recontactons très vite pour confirmer votre horaire."}
               </p>
               <button
                 type="button"
@@ -339,7 +339,7 @@ export default function ContactModal({
                 )}
 
                 <div className="mt-2 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-6 sm:col-span-2">
-                  <p className="max-w-[17rem] text-[10px] leading-relaxed text-ink/45">
+                  <p className="max-w-[17rem] text-[12px] leading-relaxed text-ink/45">
                     Vos données servent uniquement à traiter votre demande.
                   </p>
                   <button
@@ -347,7 +347,7 @@ export default function ContactModal({
                     disabled={status === "sending"}
                     className="group inline-flex items-center gap-3 bg-ink px-7 py-3.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white transition-colors hover:bg-brand disabled:cursor-wait disabled:opacity-60"
                   >
-                    {status === "sending" ? "Envoi en cours…" : "Envoyer ma demande"}
+                    {status === "sending" ? "Envoi en cours…" : "Confirmer mon créneau"}
                     <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1">
                       →
                     </span>
@@ -407,7 +407,7 @@ export default function ContactModal({
                     <div className="mt-7 border-t border-line pt-5">
                       <p className={label}>Prix total configuré</p>
                       <p className="mt-1.5 font-display text-3xl font-bold text-ink">{total}</p>
-                      <p className="mt-1.5 text-[11px] leading-relaxed text-ink/50">
+                      <p className="mt-1.5 text-[13px] leading-relaxed text-ink/50">
                         soit {mensualite} / mois, 48 mois, apport 10 %, hors assurance.
                       </p>
                     </div>
@@ -447,9 +447,9 @@ export default function ContactModal({
                     </dl>
 
                     <ul className="mt-7 grid gap-3 border-t border-line pt-5 text-[11px] uppercase tracking-[0.14em] text-ink/60">
-                      <li>Essai sur route, sans engagement</li>
-                      <li>Reprise de votre BMW et financement en concession</li>
-                      <li>Un conseiller dédié, du lundi au samedi</li>
+                      <li>Essai sur route, sur créneau réservé</li>
+                      <li>Reprise bonifiée pendant les deux jours</li>
+                      <li>Un conseiller par invité, du lundi au samedi</li>
                     </ul>
                   </>
                 )}

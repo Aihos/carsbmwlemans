@@ -12,31 +12,31 @@ type Shot = { kicker: string; title: string; src: string; alt: string; to: strin
 
 const SHOTS: Shot[] = [
   {
-    kicker: "Sportives",
+    kicker: "Sur invitation",
     title: "Essai sur la côte",
     src: "/img/d.webp",
-    alt: "BMW Coupé, essai sur la côte",
+    alt: "BMW Coupé, essai sur la côte pendant les ventes privées",
     to: "/catalogue",
   },
   {
     kicker: "BMW M",
     title: "BMW M2",
     src: "/img/troisquart/BMW-M2-2025-wallpaper.webp",
-    alt: "BMW M2, sur route",
+    alt: "BMW M2, essai encadré pendant les ventes privées",
     to: "/catalogue",
   },
   {
     kicker: "BMW i",
     title: "Passer à l'électrique",
     src: "/img/BMW-i5-2024-Side_Profile.17799284.webp",
-    alt: "BMW i5 eDrive40, profil",
+    alt: "BMW i5 eDrive40, essai pendant les ventes privées",
     to: "/catalogue",
   },
   {
-    kicker: "Berline de luxe",
+    kicker: "Vendredi 13 & samedi 14 novembre",
     title: "BMW Série 7",
     src: "/img/troisquart/BMW-7-Series-2027-wallpaper.webp",
-    alt: "BMW Série 7, essai",
+    alt: "BMW Série 7, à l'essai pendant les ventes privées",
     to: "/catalogue",
   },
 ];

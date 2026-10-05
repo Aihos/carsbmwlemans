@@ -105,37 +105,37 @@ export default function Booking() {
         <div className="grid gap-10 lg:grid-cols-[1fr_1.15fr] lg:items-center lg:gap-20">
           <div className="hidden lg:block">
             <p className="font-display text-[clamp(2.6rem,5vw,5rem)] font-bold uppercase leading-[1.06] text-white">
-              Votre
+              Vos
               <br />
-              concession
+              ventes
               <br />
-              au Mans
+              privées
             </p>
-            <p className="mt-8 max-w-sm text-[13px] leading-relaxed text-white/75">
+            <p className="mt-8 max-w-sm text-[15px] leading-relaxed text-white/75 md:text-base">
               Sur les routes de la Sarthe, un essai vaut mille photos. Installez-vous au volant,
-              ajustez la configuration avec un conseiller, repartez avec un projet clair.
+              arbitrez la configuration avec un conseiller, repartez avec un projet écrit.
             </p>
             <ul className="mt-8 grid gap-3 text-[11px] uppercase tracking-[0.16em] text-white/70">
-              <li>Essai sur route, sans engagement</li>
-              <li>Reprise de votre BMW et financement en concession</li>
-              <li>Un conseiller dédié, du lundi au samedi</li>
+              <li>Essai sur route, sur créneau réservé</li>
+              <li>Reprise bonifiée pendant les deux jours</li>
+              <li>Un conseiller par invité, du lundi au samedi</li>
             </ul>
           </div>
 
           <div className="bk-card border border-white/40 bg-white p-6 shadow-[0_40px_90px_-50px_rgba(6,33,63,0.8)] md:p-9">
             <span className="text-[10px] font-bold uppercase tracking-[0.28em] text-brand">
-              Concession BMW Le Mans
+              Ventes privées BMW Le Mans
             </span>
             <h2 className="mt-3 font-display text-[clamp(1.7rem,4vw,2.6rem)] font-bold uppercase leading-tight text-ink">
-              Réserver votre essai
+              Réserver votre créneau
             </h2>
-            <p className="mt-3 max-w-md text-[11px] leading-relaxed text-ink/60 md:text-xs">
-              Choisissez votre BMW et le créneau qui vous arrange : un conseiller vous confirme le
-              rendez-vous par email et par téléphone, et prépare le véhicule de votre essai.
+            <p className="mt-3 max-w-md text-[14px] leading-relaxed text-ink/60 md:text-[15px]">
+              Choisissez la BMW que vous voulez essayer et l'horaire qui vous arrange : un conseiller
+              vous confirme votre créneau par email et par téléphone, et prépare le véhicule.
             </p>
 
             {configuration && (
-              <p className="mt-4 border-l-2 border-ink bg-mist px-4 py-3 text-[11px] leading-relaxed text-ink/70">
+              <p className="mt-4 border-l-2 border-ink bg-mist px-4 py-3 text-[13px] leading-relaxed text-ink/70 md:text-[14px]">
                 <span className={labelClass}>Configuration retenue</span>
                 <span className="mt-1 block font-bold text-ink">{configuration}</span>
               </p>
@@ -227,13 +227,13 @@ export default function Booking() {
                 <textarea
                   name="message"
                   rows={3}
-                  placeholder="Précisez votre projet : reprise de votre BMW, financement, options…"
+                  placeholder="Précisez votre projet : reprise de votre BMW, financement, modèle souhaité…"
                   className={`${fieldClass} resize-none`}
                 />
               </label>
 
               <div className="bk-row mt-1 flex flex-wrap items-center justify-between gap-4">
-                <p className="max-w-xs text-[10px] leading-relaxed text-ink/45">
+                <p className="max-w-xs text-[12px] leading-relaxed text-ink/45">
                   Vos données servent uniquement au traitement de votre demande de rendez-vous.
                 </p>
                 <button
@@ -241,7 +241,7 @@ export default function Booking() {
                   disabled={status === "sending"}
                   className="group inline-flex items-center gap-3 bg-ink px-7 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-white transition-colors hover:bg-brand disabled:cursor-wait disabled:opacity-60"
                 >
-                  {status === "sending" ? "Envoi en cours…" : sent ? "Demande envoyée" : "Réserver mon essai"}
+                  {status === "sending" ? "Envoi en cours…" : sent ? "Demande envoyée" : "Confirmer mon créneau"}
                   <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
                 </button>
               </div>
