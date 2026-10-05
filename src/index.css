@@ -132,6 +132,20 @@
   animation: noise-shift 0.72s steps(1, end) infinite;
 }
 
+/* Entrée du panneau des Select Radix (shadcn) : léger glissement vers le bas.
+   Posée en animation CSS (pas en transition) pour que Radix attende la fin
+   avant de démonter le panneau. */
+@keyframes select-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes noise-shift {
   0% {
     background-position: 0 0;

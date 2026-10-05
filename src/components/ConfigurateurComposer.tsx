@@ -145,7 +145,7 @@ export default function ConfigurateurComposer({
     <section
       id={id}
       ref={root}
-      className={`relative flex min-h-[100svh] flex-col pb-24 ${
+      className={`relative flex min-h-[100svh] flex-col pb-24 max-lg:min-h-[calc(100svh-5rem)] max-lg:pb-0 ${
         variant === "page" ? "pt-20 md:pt-24" : "pt-12 md:pt-16"
       }`}
     >
@@ -159,20 +159,26 @@ export default function ConfigurateurComposer({
             </h1>
           </div>
 
-          <ModeleSelect
-            value={car.id}
-            onChange={(id) => setParams({ modele: id }, { replace: true })}
-          />
+          {/* Sélecteur de modèle : dans le bandeau sur grand écran ; sur mobile
+              il descend dans la feuille du bas (voir plus bas). */}
+          <div className="hidden shrink-0 lg:block lg:w-80">
+            <ModeleSelect
+              value={car.id}
+              onChange={(id) => setParams({ modele: id }, { replace: true })}
+            />
+          </div>
         </div>
 
         {/* Corps : aperçu + options.
             `lg:grid-rows-1` = minmax(0,1fr) : sans lui la ligne `auto` se cale
             sur le min-content du panneau d'options (le texte ne se comprime pas
             verticalement) et pousse la barre TERMINER hors de l'écran. */}
-        <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[1.5fr_1fr] lg:grid-rows-1">
-          {/* Aperçu */}
-          <div className="cfg-in flex min-h-0 min-w-0 flex-col">
-            <div className="grain relative flex min-h-0 flex-1 items-center justify-center overflow-hidden border border-line bg-white p-4 lg:p-6">
+        <div className="grid min-h-0 flex-1 gap-4 max-lg:flex max-lg:flex-col max-lg:justify-end lg:grid-cols-[1.5fr_1fr] lg:grid-rows-1">
+          {/* Aperçu — sur mobile il passe en calque de fond : la voiture occupe
+              tout l'écran, les options et la validation viennent par-dessus,
+              collées en bas. */}
+          <div className="cfg-in flex min-h-0 min-w-0 flex-col max-lg:absolute max-lg:inset-0 max-lg:z-0">
+            <div className="grain relative flex min-h-0 flex-1 items-center justify-center overflow-hidden border border-line bg-white p-4 max-lg:border-0 max-lg:pb-[36svh] lg:p-6">
               <div
                 className="absolute inset-0 opacity-55 transition-[background] duration-500"
                 style={{
@@ -216,8 +222,19 @@ export default function ConfigurateurComposer({
             </div>
           </div>
 
-          {/* Options */}
-          <div className="cfg-in flex min-h-0 min-w-0 flex-col gap-3 overflow-y-auto border border-line bg-white p-3.5 md:p-4 lg:max-h-[calc(100svh-14rem)]">
+          {/* Options — et, sur mobile, la feuille collée en bas : le choix du
+              modèle, les options et la validation restent sous la main pendant
+              que la photo du véhicule passe derrière. Transparence + flou pour
+              laisser voir la voiture en dessous. */}
+          <div className="cfg-in relative z-10 flex min-h-0 min-w-0 flex-col gap-3 overflow-y-auto border border-line bg-white p-3.5 md:p-4 max-lg:max-h-[52svh] max-lg:border-0 max-lg:border-t max-lg:border-line max-lg:bg-white/85 max-lg:shadow-[0_-18px_45px_-24px_rgba(6,33,63,0.45)] max-lg:backdrop-blur-md lg:max-h-[calc(100svh-14rem)]">
+            {/* Mobile : le choix du modèle ouvre la feuille */}
+            <div className="lg:hidden">
+              <ModeleSelect
+                value={car.id}
+                onChange={(id) => setParams({ modele: id }, { replace: true })}
+              />
+            </div>
+
             <div>
               <div className="flex items-baseline justify-between">
                 <h2 className={blockTitle}>Couleur</h2>
@@ -500,7 +517,7 @@ export default function ConfigurateurComposer({
       {/* Barre de validation (mobile) — même règle d'affichage que la barre
           desktop, sinon elle resterait collée en bas de toutes les pages. */}
       <div
-        className={`fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-4 border-t border-line bg-white/95 px-5 py-3 backdrop-blur-md transition-opacity duration-300 lg:hidden ${
+        className={`fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-4 border-t border-line bg-white/95 px-5 py-3 backdrop-blur-md transition-opacity duration-300 max-lg:static lg:hidden ${
           barVisible ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
       >

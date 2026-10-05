@@ -2,6 +2,13 @@ import { useRef, useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router-dom";
 import { gsap, useGSAP, reduced } from "../lib/anim";
 import { VEHICLES } from "../data/site";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
 type Status = "idle" | "sending" | "ok" | "error";
 
@@ -167,17 +174,22 @@ export default function Booking() {
                 </label>
                 <label className="block">
                   <span className={labelClass}>Modèle BMW souhaité</span>
-                  <select name="vehicule" defaultValue={vehicule} className={fieldClass}>
-                    {vehicule && !VEHICLES.includes(vehicule) && (
-                      <option value={vehicule}>{vehicule}</option>
-                    )}
-                    {VEHICLES.map((name) => (
-                      <option key={name} value={name}>
-                        {name}
-                      </option>
-                    ))}
-                    <option value="Autre modèle BMW">Autre modèle BMW</option>
-                  </select>
+                  <Select name="vehicule" defaultValue={vehicule}>
+                    <SelectTrigger className="mt-2">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {vehicule && !VEHICLES.includes(vehicule) && (
+                        <SelectItem value={vehicule}>{vehicule}</SelectItem>
+                      )}
+                      {VEHICLES.map((name) => (
+                        <SelectItem key={name} value={name}>
+                          {name}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="Autre modèle BMW">Autre modèle BMW</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </label>
               </div>
 
@@ -212,13 +224,18 @@ export default function Booking() {
                 </label>
                 <label className="block">
                   <span className={labelClass}>Créneau souhaité</span>
-                  <select name="creneau" className={fieldClass} defaultValue="09h00 – 10h00">
-                    <option>09h00 – 10h00</option>
-                    <option>10h30 – 11h30</option>
-                    <option>14h00 – 15h00</option>
-                    <option>16h00 – 17h00</option>
-                    <option>17h30 – 18h30</option>
-                  </select>
+                  <Select name="creneau" defaultValue="09h00 – 10h00">
+                    <SelectTrigger className="mt-2">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="09h00 – 10h00">09h00 – 10h00</SelectItem>
+                      <SelectItem value="10h30 – 11h30">10h30 – 11h30</SelectItem>
+                      <SelectItem value="14h00 – 15h00">14h00 – 15h00</SelectItem>
+                      <SelectItem value="16h00 – 17h00">16h00 – 17h00</SelectItem>
+                      <SelectItem value="17h30 – 18h30">17h30 – 18h30</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </label>
               </div>
 

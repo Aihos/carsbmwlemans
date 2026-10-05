@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import SmartLink from "../components/SmartLink";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
+import {
   CARS,
   CATALOGUE,
   EUR,
@@ -161,25 +168,20 @@ export default function Catalogue() {
               />
             </label>
 
-            <label className="relative flex items-center gap-1.5">
+            <label className="block">
               <span className="sr-only">Trier</span>
-              <select
-                value={sort}
-                onChange={(e) => setSort(e.target.value)}
-                className="cursor-pointer appearance-none bg-transparent pr-4 text-[12px] text-ink/70 transition-colors hover:text-ink focus:outline-none"
-              >
-                {SORTS.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute right-0 text-[9px] text-ink/40"
-              >
-                ▾
-              </span>
+              <Select value={sort} onValueChange={setSort}>
+                <SelectTrigger className="w-auto min-w-[12rem] text-[13px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {SORTS.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </label>
           </div>
         </div>

@@ -2,10 +2,12 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react"
 import { createPortal } from "react-dom";
 import { CONFIGURABLES, EUR } from "../data/site";
 
-/* Sélecteur de modèle du configurateur — grammaire shadcn/ui (Select +
-   Combobox) reprise avec les jetons du site : déclencheur en forme de champ,
-   panneau bordé avec ombre douce, champ de recherche en tête, ligne surlignée
-   au survol et au clavier, coche sur le modèle retenu.
+/* Sélecteur de modèle du configurateur — Combobox façon shadcn/ui, calqué sur
+   le composant Select du projet (mêmes bordure, ombre, typographie et angles
+   vifs : aucun arrondi) : déclencheur en forme de champ, panneau avec champ de
+   recherche en tête, ligne surlignée au survol et au clavier, coche sur le
+   modèle retenu. Radix Select n'embarque pas de recherche : d'où ce composant
+   dédié, plutôt qu'un Select sans filtre.
 
    shadcn n'est pas installé sur ce projet (pas de Radix ni de cmdk) : le
    composant est écrit ici, sans dépendance, pour ne pas alourdir le bundle ni
@@ -60,11 +62,20 @@ export default function ModeleSelect({ value, onChange }: Props) {
     setQuery("");
     setHighlight(0);
 
+    /* Le déclencheur peut être en bas de la fenêtre (feuille mobile) : le
+       panneau s'ouvre alors vers le haut au lieu de sortir de l'écran. Sa
+       hauteur réelle n'est connue qu'après son rendu — d'où le second passage
+       une image plus tard. */
     const place = () => {
       const r = triggerRef.current?.getBoundingClientRect();
-      if (r) setPos({ left: r.left, top: r.bottom + 6, width: r.width });
+      if (!r) return;
+      const h = panelRef.current?.offsetHeight ?? 336;
+      const roomBelow = window.innerHeight - r.bottom - 6;
+      const above = roomBelow < h && r.top - 6 - h > 0;
+      setPos({ left: r.left, top: above ? r.top - 6 - h : r.bottom + 6, width: r.width });
     };
     place();
+    const frame = window.requestAnimationFrame(place);
 
     const timer = window.setTimeout(() => inputRef.current?.focus(), 20);
     const onDown = (e: MouseEvent) => {
@@ -81,6 +92,7 @@ export default function ModeleSelect({ value, onChange }: Props) {
     window.addEventListener("resize", place);
     return () => {
       window.clearTimeout(timer);
+      window.cancelAnimationFrame(frame);
       document.removeEventListener("mousedown", onDown);
       document.removeEventListener("keydown", onKey);
       window.removeEventListener("scroll", place, true);
@@ -128,7 +140,7 @@ export default function ModeleSelect({ value, onChange }: Props) {
         aria-label="Choisir un modèle"
         onClick={() => setOpen((v) => !v)}
         onKeyDown={onKeyDown}
-        className="flex w-full items-center justify-between gap-3 rounded-md border border-line bg-white px-3 py-2 text-left transition-colors hover:border-ink/40 focus-visible:border-ink focus-visible:outline-none"
+        className="flex w-full items-center justify-between gap-3 border border-line bg-white px-3 py-2 text-left transition-colors hover:border-ink/40 focus-visible:border-ink focus-visible:outline-none"
       >
         <span className="min-w-0">
           <span className="block truncate font-display text-sm leading-tight text-ink">
@@ -154,7 +166,7 @@ export default function ModeleSelect({ value, onChange }: Props) {
           <div
             ref={panelRef}
             style={{ position: "fixed", left: pos.left, top: pos.top, width: pos.width }}
-            className="z-[120] overflow-hidden rounded-md border border-line bg-white shadow-[0_16px_40px_-14px_rgba(6,33,63,0.4)]"
+            className="z-[120] overflow-hidden border border-line bg-white shadow-[0_16px_40px_-14px_rgba(6,33,63,0.4)]"
           >
             <div className="flex items-center gap-2 border-b border-line px-3">
               <span aria-hidden="true" className="text-[13px] text-ink/40">

@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
 import { VEHICLES, EVENT } from "../data/site";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
 type Status = "idle" | "sending" | "ok" | "error";
 
@@ -86,6 +93,7 @@ export default function ContactModal({
   const [status, setStatus] = useState<Status>("idle");
   const [feedback, setFeedback] = useState("");
   const [jour, setJour] = useState(JOURS[0].value);
+  const [creneau, setCreneau] = useState(creneauxDuJour(JOURS[0].value)[0]);
   const firstField = useRef<HTMLInputElement>(null);
 
   const configured = Boolean(vehicule);
@@ -113,6 +121,7 @@ export default function ContactModal({
       setStatus("idle");
       setFeedback("");
       setJour(JOURS[0].value);
+      setCreneau(creneauxDuJour(JOURS[0].value)[0]);
     }
   }, [open]);
 
@@ -274,29 +283,22 @@ export default function ContactModal({
                 {!configured && (
                   <label className="block">
                     <span className={label}>Modèle BMW</span>
-                    <span className="relative mt-2 block">
-                      <select
-                        name="vehicule"
-                        defaultValue={defaultVehicule ?? VEHICLES[0]}
-                        className={`${field} appearance-none pr-6`}
-                      >
+                    <Select name="vehicule" defaultValue={defaultVehicule ?? VEHICLES[0]}>
+                      <SelectTrigger className="mt-2">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
                         {defaultVehicule && !VEHICLES.includes(defaultVehicule) && (
-                          <option value={defaultVehicule}>{defaultVehicule}</option>
+                          <SelectItem value={defaultVehicule}>{defaultVehicule}</SelectItem>
                         )}
                         {VEHICLES.map((name) => (
-                          <option key={name} value={name}>
+                          <SelectItem key={name} value={name}>
                             {name}
-                          </option>
+                          </SelectItem>
                         ))}
-                        <option value="Autre modèle BMW">Autre modèle BMW</option>
-                      </select>
-                      <span
-                        aria-hidden="true"
-                        className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-[9px] text-ink/40"
-                      >
-                        ▾
-                      </span>
-                    </span>
+                        <SelectItem value="Autre modèle BMW">Autre modèle BMW</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </label>
                 )}
 
@@ -325,50 +327,43 @@ export default function ContactModal({
 
                 <label className="block">
                   <span className={label}>Jour de l'essai</span>
-                  <span className="relative mt-2 block">
-                    <select
-                      name="date"
-                      value={jour}
-                      onChange={(e) => setJour(e.target.value)}
-                      className={`${field} appearance-none pr-6`}
-                    >
+                  <Select
+                    name="date"
+                    value={jour}
+                    onValueChange={(v) => {
+                      setJour(v);
+                      setCreneau(creneauxDuJour(v)[0]);
+                    }}
+                  >
+                    <SelectTrigger className="mt-2">
+                      {/* Le champ est demi-largeur : le déclencheur n'affiche que
+                          le jour, les horaires restent dans la liste. */}
+                      <SelectValue>{JOURS.find((j) => j.value === jour)?.label}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent className="min-w-[20rem]">
                       {JOURS.map((j) => (
-                        <option key={j.value} value={j.value}>
+                        <SelectItem key={j.value} value={j.value}>
                           {j.label} · {heure(OUVRE)} – {heure(j.ferme)}
-                        </option>
+                        </SelectItem>
                       ))}
-                    </select>
-                    <span
-                      aria-hidden="true"
-                      className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-[9px] text-ink/40"
-                    >
-                      ▾
-                    </span>
-                  </span>
+                    </SelectContent>
+                  </Select>
                 </label>
 
                 <label className="block">
                   <span className={label}>Créneau (30 min)</span>
-                  <span className="relative mt-2 block">
-                    <select
-                      key={jour}
-                      name="creneau"
-                      defaultValue={creneauxDuJour(jour)[0]}
-                      className={`${field} appearance-none pr-6`}
-                    >
+                  <Select name="creneau" value={creneau} onValueChange={setCreneau}>
+                    <SelectTrigger className="mt-2">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
                       {creneauxDuJour(jour).map((c) => (
-                        <option key={c} value={c}>
+                        <SelectItem key={c} value={c}>
                           {c}
-                        </option>
+                        </SelectItem>
                       ))}
-                    </select>
-                    <span
-                      aria-hidden="true"
-                      className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-[9px] text-ink/40"
-                    >
-                      ▾
-                    </span>
-                  </span>
+                    </SelectContent>
+                  </Select>
                 </label>
 
                 <label className="block sm:col-span-2">
