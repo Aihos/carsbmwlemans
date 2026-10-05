@@ -104,13 +104,6 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 
   log("corps reçu :", verbose ? JSON.stringify(payload) : "reçu (détail masqué en production)");
 
-  /* Robot : on répond « ok » sans rien envoyer, pour ne pas l'informer. */
-  if (clean(payload.site)) {
-    log("✗ champ piège « site » rempli → considéré comme robot, rien n'est envoyé");
-    send(res, 200, { ok: true });
-    return;
-  }
-
   const nom = clean(payload.nom, 120);
   const email = clean(payload.email, 160);
   const telephone = clean(payload.telephone, 40);
@@ -130,6 +123,34 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     message: message ? `(${message.length} caractères)` : "(VIDE)",
   });
 
+  /* Champ piège anti-spam. L'autofill du navigateur remplit parfois ce champ
+     avec les coordonnées du visiteur : c'est un faux positif, la demande doit
+     continuer. Un robot, lui, y met une URL ou un texte publicitaire. */
+  const piege = clean(payload.site);
+  const sansEspaces = (v: string) => v.replace(/[\s.\-()]/g, "").toLowerCase();
+  const autofillProbable =
+    piege !== "" &&
+    (sansEspaces(piege) === sansEspaces(email) ||
+      sansEspaces(piege) === sansEspaces(nom) ||
+      sansEspaces(piege) === sansEspaces(telephone));
+
+  if (piege && !autofillProbable) {
+    log(
+      "✗ champ piège « site » rempli (valeur :",
+      JSON.stringify(piege),
+      ") → considéré comme robot, rien n'est envoyé",
+    );
+    send(res, 200, { ok: true });
+    return;
+  }
+  if (piege) {
+    log(
+      "champ piège rempli par l'autofill du navigateur (valeur :",
+      JSON.stringify(piege),
+      ") → assimilé à un visiteur, la demande continue",
+    );
+  }
+
   if (!nom) {
     logErr("✗ validation : le nom est vide → 422");
     send(res, 422, { error: "Le nom est obligatoire." });
@@ -140,7 +161,6 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     send(res, 422, { error: "Adresse email invalide." });
     return;
   }
-
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     logErr("✗ RESEND_API_KEY absente de l'environnement → 500");
