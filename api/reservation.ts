@@ -26,6 +26,16 @@ type Payload = {
 const LIMIT = 16_000;
 const LIEU = "Ventes privées BMW Ampère Autopassion, Le Mans · 13 & 14 novembre 2026";
 
+/* Journalisation. En développement, on trace tout (y compris le contenu du
+   formulaire) pour pouvoir diagnostiquer. En production, on ne trace que le
+   déroulé et les erreurs : aucune donnée personnelle ne part dans les logs
+   Vercel. Forcer le détail en production : DEBUG_RESERVATION=1. */
+const verbose =
+  process.env.NODE_ENV !== "production" || process.env.DEBUG_RESERVATION === "1";
+
+const log = (...parts: unknown[]) => console.log("[reservation]", ...parts);
+const logErr = (...parts: unknown[]) => console.error("[reservation]", ...parts);
+
 function send(res: ServerResponse, status: number, data: unknown) {
   res.statusCode = status;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -71,12 +81,14 @@ const adresseNue = (v: string) => {
 };
 
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
+  log("--- requête reçue :", req.method ?? "?", "---");
   if (req.method === "OPTIONS") {
     res.statusCode = 204;
     res.end();
     return;
   }
   if (req.method !== "POST") {
+    log("✗ méthode refusée :", req.method ?? "?");
     send(res, 405, { error: "Méthode non autorisée." });
     return;
   }
@@ -85,12 +97,16 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   try {
     payload = await readJson(req);
   } catch {
+    logErr("✗ corps de requête illisible (JSON invalide ou trop volumineux)");
     send(res, 400, { error: "Requête illisible." });
     return;
   }
 
+  log("corps reçu :", verbose ? JSON.stringify(payload) : "reçu (détail masqué en production)");
+
   /* Robot : on répond « ok » sans rien envoyer, pour ne pas l'informer. */
   if (clean(payload.site)) {
+    log("✗ champ piège « site » rempli → considéré comme robot, rien n'est envoyé");
     send(res, 200, { ok: true });
     return;
   }
@@ -104,17 +120,30 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   const message = clean(payload.message, 4000);
   const configuration = clean(payload.configuration, 500);
 
+  log("champs exploitables :", {
+    nom: nom || "(VIDE)",
+    email: email || "(VIDE)",
+    telephone: telephone || "(VIDE)",
+    vehicule: vehicule || "(VIDE)",
+    date: date || "(VIDE)",
+    creneau: creneau || "(VIDE)",
+    message: message ? `(${message.length} caractères)` : "(VIDE)",
+  });
+
   if (!nom) {
+    logErr("✗ validation : le nom est vide → 422");
     send(res, 422, { error: "Le nom est obligatoire." });
     return;
   }
   if (!isEmail(email)) {
+    logErr(`✗ validation : adresse email invalide (reçu : ${verbose ? JSON.stringify(email) : "masqué"}) → 422`);
     send(res, 422, { error: "Adresse email invalide." });
     return;
   }
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
+    logErr("✗ RESEND_API_KEY absente de l'environnement → 500");
     send(res, 500, { error: "RESEND_API_KEY absente : renseignez le fichier .env." });
     return;
   }
@@ -133,6 +162,13 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     : isEmail(adresseDomaine)
       ? [adresseDomaine]
       : [];
+
+  log("configuration :", {
+    MAIL_FROM: from,
+    MAIL_TO: process.env.MAIL_TO ? interne : "(absente → repli sur l'adresse de MAIL_FROM)",
+    notificationInterne: boiteInterne.length ? boiteInterne : "(AUCUNE)",
+    accuseDeReception: email,
+  });
 
   const rows: [string, string][] = [
     ["Nom", nom],
@@ -239,6 +275,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
        enchaîne directement sur l'accusé au visiteur. */
     let ref: string | null = null;
     if (boiteInterne.length) {
+      log("envoi 1/2 — notification interne →", boiteInterne.join(", "));
       const { data, error } = await resend.emails.send({
         from,
         to: boiteInterne,
@@ -248,6 +285,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
         html: htmlInterne,
       });
       if (error) {
+        logErr("✗ envoi 1/2 refusé :", error.message);
         send(res, 502, { error: error.message });
         return;
       }
@@ -255,9 +293,13 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
          visiteur (page de confirmation) : elle permet de retrouver la demande
          dans la console d'envoi. */
       ref = data?.id ?? null;
+      log("✓ envoi 1/2 accepté — id Resend :", ref);
+    } else {
+      log("envoi 1/2 — aucune boîte interne configurée, notification ignorée");
     }
 
     let accuse = false;
+    log("envoi 2/2 — accusé de réception →", email);
     const client = await resend.emails.send({
       from,
       to: [email],
@@ -267,13 +309,17 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       html: htmlClient,
     });
     if (client.error) {
-      console.error("[/api/reservation] accusé client refusé :", client.error.message);
+      logErr("✗ envoi 2/2 (accusé) refusé :", client.error.message);
+      logErr("  → vérifier que le domaine de MAIL_FROM est vérifié chez Resend");
     } else {
       accuse = true;
+      log("✓ envoi 2/2 (accusé) accepté — id Resend :", client.data?.id ?? null);
     }
 
+    log("réponse : 200", { ok: true, ref: ref ?? client.data?.id ?? null, accuse });
     send(res, 200, { ok: true, ref: ref ?? client.data?.id ?? null, accuse });
   } catch (e) {
+    logErr("✗ exception pendant l'envoi :", e instanceof Error ? e.message : e);
     send(res, 502, { error: e instanceof Error ? e.message : "Envoi impossible." });
   }
 }

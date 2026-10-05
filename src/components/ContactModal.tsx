@@ -133,6 +133,11 @@ export default function ContactModal({
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const payload = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
+    /* Trace de diagnostic : visible uniquement en développement (console du
+       navigateur). En production, ce log n'existe pas dans le bundle. */
+    if (import.meta.env.DEV) {
+      console.log("[reservation] soumission du formulaire :", payload);
+    }
     setStatus("sending");
     setFeedback("");
     try {
@@ -145,7 +150,11 @@ export default function ContactModal({
         ok?: boolean;
         error?: string;
         ref?: string | null;
+        accuse?: boolean;
       };
+      if (import.meta.env.DEV) {
+        console.log("[reservation] réponse du serveur :", res.status, data);
+      }
       if (!res.ok || !data.ok) {
         console.error("[/api/reservation]", data.error);
         setStatus("error");
@@ -185,7 +194,8 @@ export default function ContactModal({
       saveReservation(rec);
       onClose();
       navigate("/confirmation", { state: rec });
-    } catch {
+    } catch (err) {
+      console.error("[/api/reservation] échec de la requête :", err);
       setStatus("error");
       setFeedback("Connexion impossible. Merci de nous appeler au 02 43 85 00 11.");
     }
@@ -258,7 +268,18 @@ export default function ContactModal({
             de remerciement dans la popup elle-même. */}
         <div className="grid gap-10 px-6 py-7 md:grid-cols-[1.05fr_0.95fr] md:gap-14 md:px-10 md:py-8">
           <>
-              <form className="grid gap-x-8 gap-y-5 sm:grid-cols-2" onSubmit={submit}>
+              <form
+                className="grid gap-x-8 gap-y-5 sm:grid-cols-2"
+                onSubmit={submit}
+                onInvalid={(e) => {
+                  if (import.meta.env.DEV) {
+                    console.log(
+                      "[reservation] soumission bloquée, champ invalide :",
+                      (e.target as HTMLInputElement).name,
+                    );
+                  }
+                }}
+              >
                 {/* Champ piège anti-spam */}
                 <input
                   type="text"
