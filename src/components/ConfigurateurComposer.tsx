@@ -145,13 +145,13 @@ export default function ConfigurateurComposer({
     <section
       id={id}
       ref={root}
-      className={`relative flex min-h-[100svh] flex-col pb-24 max-lg:min-h-[calc(100svh-5rem)] max-lg:pb-0 ${
+      className={`relative flex min-h-[100svh] flex-col pb-24 max-lg:min-h-[calc(100svh-5rem)] max-lg:pt-3 max-lg:pb-0 ${
         variant === "page" ? "pt-20 md:pt-24" : "pt-12 md:pt-16"
       }`}
     >
       <div className="mx-auto flex w-full min-h-0 max-w-[1600px] flex-1 flex-col gap-3 px-5 md:px-10">
         {/* Bandeau haut : titre + choix du modèle */}
-        <div className="cfg-in flex shrink-0 flex-wrap items-end justify-between gap-x-8 gap-y-2">
+        <div className="cfg-in flex shrink-0 flex-wrap items-end justify-between gap-x-8 gap-y-2 max-lg:relative max-lg:z-20">
           <div>
             <p className={micro}>Avant les ventes privées</p>
             <h1 className="mt-1 font-display text-[clamp(1.35rem,2.4vw,2.1rem)] font-black uppercase leading-[1.06] text-ink">
@@ -175,10 +175,14 @@ export default function ConfigurateurComposer({
             verticalement) et pousse la barre TERMINER hors de l'écran. */}
         <div className="grid min-h-0 flex-1 gap-4 max-lg:flex max-lg:flex-col max-lg:justify-end lg:grid-cols-[1.5fr_1fr] lg:grid-rows-1">
           {/* Aperçu — sur mobile il passe en calque de fond : la voiture occupe
-              tout l'écran, les options et la validation viennent par-dessus,
-              collées en bas. */}
-          <div className="cfg-in flex min-h-0 min-w-0 flex-col max-lg:absolute max-lg:inset-0 max-lg:z-0">
-            <div className="grain relative flex min-h-0 flex-1 items-center justify-center overflow-hidden border border-line bg-white p-4 max-lg:border-0 max-lg:pb-[36svh] lg:p-6">
+              le haut de l'écran, les options et la validation viennent
+              par-dessus, collées en bas. Le calque s'arrête 30svh au-dessus du
+              bas : la voiture est cadrée sur ce qui reste visible, et son bas
+              de caisse dépasse sous la feuille translucide — le dessin utile ne
+              remplit que ~40 % à ~72 % de la hauteur du PNG, d'où ce cadrage
+              plutôt qu'un centrage dans tout l'écran. */}
+          <div className="cfg-in flex min-h-0 min-w-0 flex-col max-lg:absolute max-lg:inset-x-0 max-lg:top-0 max-lg:bottom-[42svh] max-lg:z-0">
+            <div className="grain relative flex min-h-0 flex-1 items-center justify-center overflow-hidden border border-line bg-white p-4 max-lg:border-0 lg:p-6">
               <div
                 className="absolute inset-0 opacity-55 transition-[background] duration-500"
                 style={{
@@ -226,7 +230,7 @@ export default function ConfigurateurComposer({
               modèle, les options et la validation restent sous la main pendant
               que la photo du véhicule passe derrière. Transparence + flou pour
               laisser voir la voiture en dessous. */}
-          <div className="cfg-in relative z-10 flex min-h-0 min-w-0 flex-col gap-3 overflow-y-auto border border-line bg-white p-3.5 md:p-4 max-lg:max-h-[52svh] max-lg:border-0 max-lg:border-t max-lg:border-line max-lg:bg-white/85 max-lg:shadow-[0_-18px_45px_-24px_rgba(6,33,63,0.45)] max-lg:backdrop-blur-md lg:max-h-[calc(100svh-14rem)]">
+          <div className="cfg-in relative z-10 flex min-h-0 min-w-0 flex-col gap-3 overflow-y-auto border border-line bg-white p-3.5 md:p-4 max-lg:max-h-[37svh] max-lg:border-0 max-lg:border-t max-lg:border-line max-lg:bg-white/85 max-lg:shadow-[0_-18px_45px_-24px_rgba(6,33,63,0.45)] max-lg:backdrop-blur-md lg:max-h-[calc(100svh-14rem)]">
             {/* Mobile : le choix du modèle ouvre la feuille */}
             <div className="lg:hidden">
               <ModeleSelect
