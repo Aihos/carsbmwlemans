@@ -112,7 +112,8 @@ garder `MAIL_FROM` sur `onboarding@resend.dev` et `MAIL_TO` sur cette adresse.
 `vite.config.ts` la sert via un middleware : même contrat, même code.
 
 - `POST /api/reservation` — corps JSON `{ nom, email, telephone, vehicule, date, creneau, message, configuration }`
-- nom + email valides obligatoires, champ piège `site` anti-spam
+- nom + email valides obligatoires
+- limitation de débit (anti-spam-click) : 5 demandes / 15 min par connexion, 2 / 5 min par adresse email ; au-delà, réponse `429` avec un message affiché au visiteur
 - réponse `{ ok: true, ref, accuse }` ou `{ error: "..." }`
 
 `vercel.json` réécrit toutes les URLs (hors `/api/`) vers `index.html` pour que

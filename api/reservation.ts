@@ -19,12 +19,58 @@ type Payload = {
   creneau?: string;
   message?: string;
   configuration?: string;
-  /** champ piège anti-spam : doit rester vide (invisible pour un humain) */
-  site?: string;
 };
 
 const LIMIT = 16_000;
 const LIEU = "Ventes privées BMW Ampère Autopassion, Le Mans · 13 & 14 novembre 2026";
+
+/* Journalisation. En développement, on trace tout (y compris le contenu du
+   formulaire) pour pouvoir diagnostiquer. En production, on ne trace que le
+   déroulé et les erreurs : aucune donnée personnelle ne part dans les logs
+   Vercel. Forcer le détail en production : DEBUG_RESERVATION=1. */
+const verbose =
+  process.env.NODE_ENV !== "production" || process.env.DEBUG_RESERVATION === "1";
+
+const log = (...parts: unknown[]) => console.log("[reservation]", ...parts);
+const logErr = (...parts: unknown[]) => console.error("[reservation]", ...parts);
+
+/* Anti-spam-click. Compteurs en mémoire de l'instance serverless : ils
+   arrêtent un clic frénétique ou un petit script, sans jamais gêner un vrai
+   visiteur. Fenêtres glissantes, aucune donnée conservée au-delà.
+   - par connexion : 5 demandes / 15 min
+   - par adresse email : 2 demandes / 5 min */
+const MAX_PAR_IP = 5;
+const FENETRE_IP_MS = 15 * 60 * 1000;
+const MAX_PAR_EMAIL = 2;
+const FENETRE_EMAIL_MS = 5 * 60 * 1000;
+
+const compteursIp = new Map<string, number[]>();
+const compteursEmail = new Map<string, number[]>();
+
+/** true si la limite est dépassée (l'appel compte l'envoi quand il passe). */
+function limiteAtteinte(
+  table: Map<string, number[]>,
+  cle: string,
+  max: number,
+  fenetre: number,
+): boolean {
+  const t = Date.now();
+  const recents = (table.get(cle) ?? []).filter((ts) => t - ts < fenetre);
+  if (recents.length >= max) {
+    table.set(cle, recents);
+    return true;
+  }
+  recents.push(t);
+  table.set(cle, recents);
+  /* Ménage : les instances Vercel vivent peu, mais on évite que la table
+     enfle si l'instance est réutilisée longtemps. */
+  if (table.size > 500) {
+    for (const [k, v] of table) {
+      if (!v.some((ts) => t - ts < fenetre)) table.delete(k);
+    }
+  }
+  return false;
+}
 
 function send(res: ServerResponse, status: number, data: unknown) {
   res.statusCode = status;
@@ -71,12 +117,14 @@ const adresseNue = (v: string) => {
 };
 
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
+  log("--- requête reçue :", req.method ?? "?", "---");
   if (req.method === "OPTIONS") {
     res.statusCode = 204;
     res.end();
     return;
   }
   if (req.method !== "POST") {
+    log("✗ méthode refusée :", req.method ?? "?");
     send(res, 405, { error: "Méthode non autorisée." });
     return;
   }
@@ -85,15 +133,12 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   try {
     payload = await readJson(req);
   } catch {
+    logErr("✗ corps de requête illisible (JSON invalide ou trop volumineux)");
     send(res, 400, { error: "Requête illisible." });
     return;
   }
 
-  /* Robot : on répond « ok » sans rien envoyer, pour ne pas l'informer. */
-  if (clean(payload.site)) {
-    send(res, 200, { ok: true });
-    return;
-  }
+  log("corps reçu :", verbose ? JSON.stringify(payload) : "reçu (détail masqué en production)");
 
   const nom = clean(payload.nom, 120);
   const email = clean(payload.email, 160);
@@ -104,17 +149,56 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   const message = clean(payload.message, 4000);
   const configuration = clean(payload.configuration, 500);
 
+  log("champs exploitables :", {
+    nom: nom || "(VIDE)",
+    email: email || "(VIDE)",
+    telephone: telephone || "(VIDE)",
+    vehicule: vehicule || "(VIDE)",
+    date: date || "(VIDE)",
+    creneau: creneau || "(VIDE)",
+    message: message ? `(${message.length} caractères)` : "(VIDE)",
+  });
+
   if (!nom) {
+    logErr("✗ validation : le nom est vide → 422");
     send(res, 422, { error: "Le nom est obligatoire." });
     return;
   }
   if (!isEmail(email)) {
+    logErr(`✗ validation : adresse email invalide (reçu : ${verbose ? JSON.stringify(email) : "masqué"}) → 422`);
     send(res, 422, { error: "Adresse email invalide." });
     return;
   }
+  /* Anti-spam-click : la demande est comptée par connexion et par adresse.
+     Le message renvoyé est destiné au visiteur, il s'affiche tel quel. */
+  const ip =
+    String(req.headers["x-forwarded-for"] ?? "")
+      .split(",")[0]
+      .trim() ||
+    req.socket?.remoteAddress ||
+    "inconnue";
+
+  if (limiteAtteinte(compteursIp, ip, MAX_PAR_IP, FENETRE_IP_MS)) {
+    logErr(`✗ anti-spam : trop de demandes depuis ${ip} (max ${MAX_PAR_IP} / 15 min) → 429`);
+    send(res, 429, {
+      error:
+        "Trop de demandes envoyées depuis cette connexion. Merci de réessayer dans quelques minutes.",
+    });
+    return;
+  }
+  if (limiteAtteinte(compteursEmail, email.toLowerCase(), MAX_PAR_EMAIL, FENETRE_EMAIL_MS)) {
+    logErr(`✗ anti-spam : demande en double (${verbose ? email : "adresse masquée"}) → 429`);
+    send(res, 429, {
+      error:
+        "Une demande vient déjà d'être envoyée avec cette adresse. Merci de patienter un instant.",
+    });
+    return;
+  }
+  log("anti-spam : demande acceptée dans les limites (ip :", ip, ")");
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
+    logErr("✗ RESEND_API_KEY absente de l'environnement → 500");
     send(res, 500, { error: "RESEND_API_KEY absente : renseignez le fichier .env." });
     return;
   }
@@ -133,6 +217,13 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     : isEmail(adresseDomaine)
       ? [adresseDomaine]
       : [];
+
+  log("configuration :", {
+    MAIL_FROM: from,
+    MAIL_TO: process.env.MAIL_TO ? interne : "(absente → repli sur l'adresse de MAIL_FROM)",
+    notificationInterne: boiteInterne.length ? boiteInterne : "(AUCUNE)",
+    accuseDeReception: email,
+  });
 
   const rows: [string, string][] = [
     ["Nom", nom],
@@ -239,6 +330,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
        enchaîne directement sur l'accusé au visiteur. */
     let ref: string | null = null;
     if (boiteInterne.length) {
+      log("envoi 1/2 — notification interne →", boiteInterne.join(", "));
       const { data, error } = await resend.emails.send({
         from,
         to: boiteInterne,
@@ -248,6 +340,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
         html: htmlInterne,
       });
       if (error) {
+        logErr("✗ envoi 1/2 refusé :", error.message);
         send(res, 502, { error: error.message });
         return;
       }
@@ -255,9 +348,13 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
          visiteur (page de confirmation) : elle permet de retrouver la demande
          dans la console d'envoi. */
       ref = data?.id ?? null;
+      log("✓ envoi 1/2 accepté — id Resend :", ref);
+    } else {
+      log("envoi 1/2 — aucune boîte interne configurée, notification ignorée");
     }
 
     let accuse = false;
+    log("envoi 2/2 — accusé de réception →", email);
     const client = await resend.emails.send({
       from,
       to: [email],
@@ -267,13 +364,17 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       html: htmlClient,
     });
     if (client.error) {
-      console.error("[/api/reservation] accusé client refusé :", client.error.message);
+      logErr("✗ envoi 2/2 (accusé) refusé :", client.error.message);
+      logErr("  → vérifier que le domaine de MAIL_FROM est vérifié chez Resend");
     } else {
       accuse = true;
+      log("✓ envoi 2/2 (accusé) accepté — id Resend :", client.data?.id ?? null);
     }
 
+    log("réponse : 200", { ok: true, ref: ref ?? client.data?.id ?? null, accuse });
     send(res, 200, { ok: true, ref: ref ?? client.data?.id ?? null, accuse });
   } catch (e) {
+    logErr("✗ exception pendant l'envoi :", e instanceof Error ? e.message : e);
     send(res, 502, { error: e instanceof Error ? e.message : "Envoi impossible." });
   }
 }
