@@ -97,6 +97,8 @@ export default function ContactModal({
   const [jour, setJour] = useState(JOURS[0].value);
   const [creneau, setCreneau] = useState(creneauxDuJour(JOURS[0].value)[0]);
   const firstField = useRef<HTMLInputElement>(null);
+  /* Verrou anti double-clic : une seule demande en vol a la fois. */
+  const envoiEnCours = useRef(false);
   const navigate = useNavigate();
 
   const configured = Boolean(vehicule);
@@ -138,6 +140,11 @@ export default function ContactModal({
     if (import.meta.env.DEV) {
       console.log("[reservation] soumission du formulaire :", payload);
     }
+    if (envoiEnCours.current) {
+      if (import.meta.env.DEV) console.log("[reservation] clic ignore : un envoi est deja en cours");
+      return;
+    }
+    envoiEnCours.current = true;
     setStatus("sending");
     setFeedback("");
     try {
@@ -158,9 +165,15 @@ export default function ContactModal({
       if (!res.ok || !data.ok) {
         console.error("[/api/reservation]", data.error);
         setStatus("error");
+        /* Les refus 422 (saisie) et 429 (demandes trop rapprochees) sont
+           ecrits pour le visiteur : on les affiche tels quels. Les autres
+           messages restent techniques, on garde le texte generique. */
         setFeedback(
-          "L'envoi n'a pas abouti. Merci de réessayer ou de nous appeler au 02 43 85 00 11.",
+          res.status === 422 || res.status === 429
+            ? (data.error ?? "L'envoi n'a pas abouti.")
+            : "L'envoi n'a pas abouti. Merci de réessayer ou de nous appeler au 02 43 85 00 11.",
         );
+        envoiEnCours.current = false;
         return;
       }
 
@@ -192,12 +205,17 @@ export default function ContactModal({
         options,
       };
       saveReservation(rec);
+      /* Le modal vit au niveau de l'application, il n'est pas demonte en
+         changeant de page : sans ce deverrouillage, la demande suivante
+         serait ignoree en silence. */
+      envoiEnCours.current = false;
       onClose();
       navigate("/confirmation", { state: rec });
     } catch (err) {
       console.error("[/api/reservation] échec de la requête :", err);
       setStatus("error");
       setFeedback("Connexion impossible. Merci de nous appeler au 02 43 85 00 11.");
+      envoiEnCours.current = false;
     }
   };
 

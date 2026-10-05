@@ -34,6 +34,44 @@ const verbose =
 const log = (...parts: unknown[]) => console.log("[reservation]", ...parts);
 const logErr = (...parts: unknown[]) => console.error("[reservation]", ...parts);
 
+/* Anti-spam-click. Compteurs en mémoire de l'instance serverless : ils
+   arrêtent un clic frénétique ou un petit script, sans jamais gêner un vrai
+   visiteur. Fenêtres glissantes, aucune donnée conservée au-delà.
+   - par connexion : 5 demandes / 15 min
+   - par adresse email : 2 demandes / 5 min */
+const MAX_PAR_IP = 5;
+const FENETRE_IP_MS = 15 * 60 * 1000;
+const MAX_PAR_EMAIL = 2;
+const FENETRE_EMAIL_MS = 5 * 60 * 1000;
+
+const compteursIp = new Map<string, number[]>();
+const compteursEmail = new Map<string, number[]>();
+
+/** true si la limite est dépassée (l'appel compte l'envoi quand il passe). */
+function limiteAtteinte(
+  table: Map<string, number[]>,
+  cle: string,
+  max: number,
+  fenetre: number,
+): boolean {
+  const t = Date.now();
+  const recents = (table.get(cle) ?? []).filter((ts) => t - ts < fenetre);
+  if (recents.length >= max) {
+    table.set(cle, recents);
+    return true;
+  }
+  recents.push(t);
+  table.set(cle, recents);
+  /* Ménage : les instances Vercel vivent peu, mais on évite que la table
+     enfle si l'instance est réutilisée longtemps. */
+  if (table.size > 500) {
+    for (const [k, v] of table) {
+      if (!v.some((ts) => t - ts < fenetre)) table.delete(k);
+    }
+  }
+  return false;
+}
+
 function send(res: ServerResponse, status: number, data: unknown) {
   res.statusCode = status;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -131,6 +169,33 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     send(res, 422, { error: "Adresse email invalide." });
     return;
   }
+  /* Anti-spam-click : la demande est comptée par connexion et par adresse.
+     Le message renvoyé est destiné au visiteur, il s'affiche tel quel. */
+  const ip =
+    String(req.headers["x-forwarded-for"] ?? "")
+      .split(",")[0]
+      .trim() ||
+    req.socket?.remoteAddress ||
+    "inconnue";
+
+  if (limiteAtteinte(compteursIp, ip, MAX_PAR_IP, FENETRE_IP_MS)) {
+    logErr(`✗ anti-spam : trop de demandes depuis ${ip} (max ${MAX_PAR_IP} / 15 min) → 429`);
+    send(res, 429, {
+      error:
+        "Trop de demandes envoyées depuis cette connexion. Merci de réessayer dans quelques minutes.",
+    });
+    return;
+  }
+  if (limiteAtteinte(compteursEmail, email.toLowerCase(), MAX_PAR_EMAIL, FENETRE_EMAIL_MS)) {
+    logErr(`✗ anti-spam : demande en double (${verbose ? email : "adresse masquée"}) → 429`);
+    send(res, 429, {
+      error:
+        "Une demande vient déjà d'être envoyée avec cette adresse. Merci de patienter un instant.",
+    });
+    return;
+  }
+  log("anti-spam : demande acceptée dans les limites (ip :", ip, ")");
+
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     logErr("✗ RESEND_API_KEY absente de l'environnement → 500");
