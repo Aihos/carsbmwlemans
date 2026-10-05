@@ -19,8 +19,6 @@ type Payload = {
   creneau?: string;
   message?: string;
   configuration?: string;
-  /** champ piège anti-spam : doit rester vide (invisible pour un humain) */
-  site?: string;
 };
 
 const LIMIT = 16_000;
@@ -122,34 +120,6 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     creneau: creneau || "(VIDE)",
     message: message ? `(${message.length} caractères)` : "(VIDE)",
   });
-
-  /* Champ piège anti-spam. L'autofill du navigateur remplit parfois ce champ
-     avec les coordonnées du visiteur : c'est un faux positif, la demande doit
-     continuer. Un robot, lui, y met une URL ou un texte publicitaire. */
-  const piege = clean(payload.site);
-  const sansEspaces = (v: string) => v.replace(/[\s.\-()]/g, "").toLowerCase();
-  const autofillProbable =
-    piege !== "" &&
-    (sansEspaces(piege) === sansEspaces(email) ||
-      sansEspaces(piege) === sansEspaces(nom) ||
-      sansEspaces(piege) === sansEspaces(telephone));
-
-  if (piege && !autofillProbable) {
-    log(
-      "✗ champ piège « site » rempli (valeur :",
-      JSON.stringify(piege),
-      ") → considéré comme robot, rien n'est envoyé",
-    );
-    send(res, 200, { ok: true });
-    return;
-  }
-  if (piege) {
-    log(
-      "champ piège rempli par l'autofill du navigateur (valeur :",
-      JSON.stringify(piege),
-      ") → assimilé à un visiteur, la demande continue",
-    );
-  }
 
   if (!nom) {
     logErr("✗ validation : le nom est vide → 422");

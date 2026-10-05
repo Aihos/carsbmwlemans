@@ -280,20 +280,6 @@ export default function ContactModal({
                   }
                 }}
               >
-                {/* Champ piège anti-spam : hors écran, et readOnly pour que
-                    l'autofill du navigateur (qui remplissait ce champ avec
-                    l'adresse email du visiteur) ne puisse pas le remplir. Un
-                    robot qui écrit directement dans le DOM le remplit malgré
-                    tout : il est alors écarté. */}
-                <input
-                  type="text"
-                  name="site"
-                  tabIndex={-1}
-                  readOnly
-                  autoComplete="off"
-                  aria-hidden="true"
-                  className="pointer-events-none absolute -left-[9999px] h-0 w-0 opacity-0"
-                />
                 {configured ? (
                   <>
                     <input type="hidden" name="vehicule" value={vehicule} />
