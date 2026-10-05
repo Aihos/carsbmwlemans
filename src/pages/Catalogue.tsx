@@ -266,7 +266,7 @@ export default function Catalogue() {
 
                   {/* Corps : pastille, nom, mensualité, méta, action */}
                   <div className="flex flex-1 flex-col p-5 md:p-6">
-                    <span className="inline-flex w-fit items-center rounded-full bg-ink px-3.5 py-1.5 text-[11px] leading-none text-white">
+                    <span className="inline-flex w-fit items-center bg-ink/10 px-3.5 py-1.5 text-[11px] leading-none text-ink">
                       {c.tag ?? c.family}
                     </span>
 
