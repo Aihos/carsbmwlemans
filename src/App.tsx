@@ -27,19 +27,31 @@ function Shell() {
 
   /* Révélations au scroll recréées à chaque changement de page, puis
      positionnement : ancre de l'URL si elle existe, sinon haut de page.
+     ScrollTrigger.refresh() restaure la position de défilement qu'il a
+     mémorisée. Or une navigation interne (react-router) ne recharge pas la
+     page : le navigateur garde la position de l'écran quitté, et ce refresh la
+     remet en place — le retour en haut était donc annulé. Le positionnement est
+     réappliqué APRÈS chaque refresh, y compris celui du second passage.
      Le défilement est fait « instant » (pas de smooth) : un refresh de
      ScrollTrigger annulerait une animation de scroll en cours. */
   useEffect(() => {
     if (!ready) return;
     const cleanup = initScrollAnimations();
-    ScrollTrigger.refresh();
 
-    const target = hash ? document.querySelector(hash) : null;
-    if (target) target.scrollIntoView({ behavior: "instant", block: "start" });
-    else window.scrollTo({ top: 0, behavior: "instant" });
+    const place = () => {
+      const target = hash ? document.querySelector(hash) : null;
+      if (target) target.scrollIntoView({ behavior: "instant", block: "start" });
+      else window.scrollTo({ top: 0, behavior: "instant" });
+    };
+
+    ScrollTrigger.refresh();
+    place();
 
     /* Second passage une fois les images et la police en place */
-    const timer = window.setTimeout(() => ScrollTrigger.refresh(), 200);
+    const timer = window.setTimeout(() => {
+      ScrollTrigger.refresh();
+      place();
+    }, 200);
     return () => {
       window.clearTimeout(timer);
       cleanup();

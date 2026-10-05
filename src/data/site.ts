@@ -290,6 +290,10 @@ const SHOWCASE = [
 
 export const CARS: Car[] = SHOWCASE.map((id) => CATALOGUE.find((c) => c.id === id)!);
 
+/* Tous les véhicules du catalogue ont leur visuel produit : le configurateur
+   propose la gamme entière, pas seulement la sélection de l'accueil. */
+export const CONFIGURABLES: CatalogueCar[] = CATALOGUE;
+
 export const FAMILIES: Family[] = ["BMW M", "BMW i", "BMW Série"];
 
 export const SORTS = [
@@ -385,7 +389,7 @@ export const NEWS: News[] = [
       "La M2 reste la plus compacte des BMW M, et la plus joueuse. Notre exemplaire de démonstration se conduit pendant l'événement, essai encadré, sur créneau réservé.",
     img: "/img/troisquart/BMW-M2-2025-wallpaper.webp",
     alt: "BMW M2, trois-quarts",
-    to: "/configurateur?modele=bmw-m2-m-xdrive",
+    to: "/catalogue",
   },
   {
     id: "news-i5",

@@ -3,11 +3,13 @@ import { useSearchParams } from "react-router-dom";
 import ContactModal from "./ContactModal";
 import SmartLink from "./SmartLink";
 import WheelIcon from "./WheelIcon";
+import ModeleSelect from "./ModeleSelect";
 import AccessoireIcon from "./AccessoireIcon";
 import {
   ACCESSORIES,
   CARS,
   COLORS,
+  CONFIGURABLES,
   ENGINES,
   EUR,
   EUR2,
@@ -64,8 +66,11 @@ export default function ConfigurateurComposer({
     };
   }, []);
 
+  /* Modèle ouvert par défaut : le premier de la sélection de l'accueil
+     (BMW Z4 M40i). Tout le catalogue est configurable, chaque véhicule ayant
+     son visuel produit dans public/img/produit/troisquart/. */
   const modeleId = params.get("modele") ?? CARS[0].id;
-  const car = CARS.find((c) => c.id === modeleId) ?? CARS[0];
+  const car = CONFIGURABLES.find((c) => c.id === modeleId) ?? CONFIGURABLES[0];
 
   const [colorId, setColorId] = useState(COLORS[0].id);
   const [wheelId, setWheelId] = useState(WHEELS[0].id);
@@ -154,35 +159,10 @@ export default function ConfigurateurComposer({
             </h1>
           </div>
 
-          <div className="no-scrollbar flex max-w-full gap-2 overflow-x-auto pb-0.5">
-            {CARS.map((c) => {
-              const active = c.id === car.id;
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => setParams({ modele: c.id }, { replace: true })}
-                  aria-pressed={active}
-                  className={`shrink-0 border px-3.5 py-2 text-left transition-colors ${
-                    active
-                      ? "border-ink bg-brand text-white"
-                      : "border-line bg-white text-ink hover:border-ink/40"
-                  }`}
-                >
-                  <span className="block whitespace-nowrap font-display text-sm leading-tight">
-                    {c.name}
-                  </span>
-                  <span
-                    className={`mt-0.5 block text-[9px] uppercase tracking-[0.14em] ${
-                      active ? "text-white/70" : "text-ink/45"
-                    }`}
-                  >
-                    {EUR(c.price)}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+          <ModeleSelect
+            value={car.id}
+            onChange={(id) => setParams({ modele: id }, { replace: true })}
+          />
         </div>
 
         {/* Corps : aperçu + options.
