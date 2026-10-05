@@ -218,7 +218,7 @@ export const ACCESSORIES: Accessory[] = [
 ];
 
 /** Logo BMW de la concession (roundel) */
-export const ROUNDEL = "/img/logo/BMW.svg";
+export const ROUNDEL = "../public/img/logo/BMW.svg";
 
 export const EUR = (n: number) =>
   new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n);
