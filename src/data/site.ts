@@ -217,8 +217,18 @@ export const ACCESSORIES: Accessory[] = [
   },
 ];
 
-/** Logo BMW de la concession (roundel) */
-export const ROUNDEL = "../public/img/logo/BMW.svg";
+/** Logo BMW de la concession (roundel).
+    Chemin absolu depuis la racine du site : `vite build` recopie le contenu de
+    `public/` à la racine de `dist/`, donc `/img/logo/BMW.svg`. Un chemin
+    relatif (`../public/img/…`) marche en dev mais donne un 404 en production —
+    c'était le cas du logo du pied de page. */
+export const ROUNDEL = "/img/logo/BMW.svg";
+
+/** Même roundel, décliné pour les fonds sombres (blanc + bleu, sans le noir de
+    l'anneau) — le fichier que porte déjà l'en-tête sur la vidéo du hero. À
+    préférer au filtre `brightness-0 invert`, qui aplatit le logo en disque
+    blanc et efface les quadrants. */
+export const ROUNDEL_WHITE = "/img/logo/logoHeader).svg";
 
 export const EUR = (n: number) =>
   new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n);

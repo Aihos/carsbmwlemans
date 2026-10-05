@@ -1,6 +1,6 @@
 import SmartLink from "./SmartLink";
 import { useReservation } from "../lib/reservation";
-import { EVENT, ROUNDEL } from "../data/site";
+import { EVENT, ROUNDEL_WHITE } from "../data/site";
 
 /* Pied de page.
    Bande de marque + appel à l'action, puis les quatre groupes de navigation,
@@ -98,9 +98,9 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-4">
               <img
-                src={ROUNDEL}
+                src={ROUNDEL_WHITE}
                 alt="BMW"
-                className="h-10 w-10 brightness-0 invert md:h-12 md:w-12"
+                className="h-10 w-10 md:h-12 md:w-12"
               />
               <span className="leading-none">
                 <span className="block text-[15px] uppercase leading-tight tracking-[0.14em] md:text-base">
