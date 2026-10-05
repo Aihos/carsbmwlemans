@@ -166,7 +166,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     </div>`;
 
   try {
-    const { error } = await new Resend(apiKey).emails.send({
+    const { data, error } = await new Resend(apiKey).emails.send({
       from,
       to,
       replyTo: email,
@@ -178,7 +178,10 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
       send(res, 502, { error: error.message });
       return;
     }
-    send(res, 200, { ok: true });
+    /* L'identifiant d'envoi Resend devient la référence de suivi affichée au
+       visiteur (page de confirmation) : elle permet de retrouver la demande
+       dans la console d'envoi. */
+    send(res, 200, { ok: true, ref: data?.id ?? null });
   } catch (e) {
     send(res, 502, { error: e instanceof Error ? e.message : "Envoi impossible." });
   }

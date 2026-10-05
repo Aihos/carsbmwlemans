@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import Catalogue from "./pages/Catalogue";
 import ConfigurateurPage from "./pages/ConfigurateurPage";
 import ActualitesPage from "./pages/ActualitesPage";
+import Confirmation from "./pages/Confirmation";
 import { ScrollTrigger, initScrollAnimations } from "./lib/anim";
 import { ReservationProvider } from "./lib/reservation";
 
@@ -70,6 +71,9 @@ function Shell() {
           <Route path="/catalogue" element={<Catalogue />} />
           <Route path="/configurateur" element={<ConfigurateurPage />} />
           <Route path="/actualites" element={<ActualitesPage />} />
+          {/* Page de confirmation : volontairement absente de la navigation,
+              on n'y arrive qu'en envoyant un formulaire de rendez-vous. */}
+          <Route path="/confirmation" element={<Confirmation />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

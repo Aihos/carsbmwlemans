@@ -1,7 +1,8 @@
 import { useRef, useState, type FormEvent } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { gsap, useGSAP, reduced } from "../lib/anim";
 import { VEHICLES } from "../data/site";
+import { jourLisible, refSuivi, saveReservation, type Reservation } from "../lib/confirmation";
 import {
   Select,
   SelectContent,
@@ -10,11 +11,11 @@ import {
   SelectValue,
 } from "./ui/select";
 
-type Status = "idle" | "sending" | "ok" | "error";
+type Status = "idle" | "sending" | "error";
 
 export default function Booking() {
   const root = useRef<HTMLElement>(null);
-  const okRef = useRef<HTMLParagraphElement>(null);
+  const navigate = useNavigate();
   const [status, setStatus] = useState<Status>("idle");
   const [feedback, setFeedback] = useState("");
   const [params] = useSearchParams();
@@ -22,7 +23,6 @@ export default function Booking() {
   /* Pré-remplissage quand on arrive du configurateur */
   const vehicule = params.get("vehicule") ?? "";
   const configuration = params.get("config") ?? "";
-  const sent = status === "ok";
 
   useGSAP(
     () => {
@@ -54,15 +54,6 @@ export default function Booking() {
     { scope: root },
   );
 
-  useGSAP(
-    () => {
-      if (sent && okRef.current && !reduced()) {
-        gsap.fromTo(okRef.current, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.6 });
-      }
-    },
-    { dependencies: [sent], scope: root },
-  );
-
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -77,7 +68,11 @@ export default function Booking() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+      const data = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        error?: string;
+        ref?: string | null;
+      };
 
       if (!res.ok || !data.ok) {
         /* Le détail technique reste dans la réponse de l'API et la console :
@@ -87,7 +82,24 @@ export default function Booking() {
         setFeedback("L'envoi n'a pas abouti. Merci de réessayer ou de nous appeler au 02 43 85 00 11.");
         return;
       }
-      setStatus("ok");
+
+      /* Demande acceptée : le visiteur part sur la page de confirmation, qui
+         porte le récapitulatif et le téléchargement PDF. Le champ piège
+         anti-spam n'est jamais transmis. */
+      const rec: Reservation = {
+        ref: refSuivi(data.ref),
+        nom: payload.nom ?? "",
+        email: payload.email ?? "",
+        telephone: payload.telephone ?? "",
+        vehicule: payload.vehicule ?? "",
+        jour: jourLisible(payload.date ?? ""),
+        creneau: payload.creneau ?? "",
+        message: payload.message ?? "",
+        configuration: payload.configuration ?? "",
+        options: [],
+      };
+      saveReservation(rec);
+      navigate("/confirmation", { state: rec });
     } catch {
       setStatus("error");
       setFeedback("Connexion impossible. Merci de nous appeler au 02 43 85 00 11.");
@@ -258,20 +270,10 @@ export default function Booking() {
                   disabled={status === "sending"}
                   className="group inline-flex items-center gap-3 bg-ink px-7 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-white transition-colors hover:bg-brand disabled:cursor-wait disabled:opacity-60"
                 >
-                  {status === "sending" ? "Envoi en cours…" : sent ? "Demande envoyée" : "Confirmer mon créneau"}
+                  {status === "sending" ? "Envoi en cours…" : "Confirmer mon créneau"}
                   <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
                 </button>
               </div>
-
-              <p
-                ref={okRef}
-                role="status"
-                aria-live="polite"
-                className={`text-[11px] font-bold text-brand ${sent ? "" : "hidden"}`}
-              >
-                Merci, votre demande a bien été transmise. Nous confirmons votre créneau
-                rapidement.
-              </p>
 
               {status === "error" && (
                 <p role="alert" className="text-[11px] font-bold text-[#9c1b26]">

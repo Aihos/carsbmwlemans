@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate } from "react-router-dom";
 import { VEHICLES, EVENT } from "../data/site";
+import { jourLisible, refSuivi, saveReservation, type Reservation, type ReservationOption } from "../lib/confirmation";
 import {
   Select,
   SelectContent,
@@ -9,7 +11,7 @@ import {
   SelectValue,
 } from "./ui/select";
 
-type Status = "idle" | "sending" | "ok" | "error";
+type Status = "idle" | "sending" | "error";
 
 type Props = {
   open: boolean;
@@ -95,6 +97,7 @@ export default function ContactModal({
   const [jour, setJour] = useState(JOURS[0].value);
   const [creneau, setCreneau] = useState(creneauxDuJour(JOURS[0].value)[0]);
   const firstField = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   const configured = Boolean(vehicule);
 
@@ -138,7 +141,11 @@ export default function ContactModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+      const data = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        error?: string;
+        ref?: string | null;
+      };
       if (!res.ok || !data.ok) {
         console.error("[/api/reservation]", data.error);
         setStatus("error");
@@ -147,7 +154,37 @@ export default function ContactModal({
         );
         return;
       }
-      setStatus("ok");
+
+      /* Demande acceptée : la popup se ferme, le visiteur part sur
+         /confirmation qui porte le récapitulatif et le téléchargement PDF. */
+      const options = [
+        colorName && { label: "Couleur", value: colorName },
+        jantes && { label: "Jantes", value: jantes },
+        moteur && { label: "Motorisation", value: moteur },
+        sellerie && { label: "Sellerie", value: sellerie },
+        inserts && { label: "Inserts décoratifs", value: inserts },
+        accessoires && { label: "Accessoires", value: accessoires },
+        total && {
+          label: "Prix total configuré",
+          value: mensualite ? `${total} · soit ${mensualite} / mois` : total,
+        },
+      ].filter(Boolean) as ReservationOption[];
+
+      const rec: Reservation = {
+        ref: refSuivi(data.ref),
+        nom: payload.nom ?? "",
+        email: payload.email ?? "",
+        telephone: payload.telephone ?? "",
+        vehicule: payload.vehicule ?? "",
+        jour: jourLisible(payload.date ?? ""),
+        creneau: payload.creneau ?? "",
+        message: payload.message ?? "",
+        configuration: payload.configuration ?? "",
+        options,
+      };
+      saveReservation(rec);
+      onClose();
+      navigate("/confirmation", { state: rec });
     } catch {
       setStatus("error");
       setFeedback("Connexion impossible. Merci de nous appeler au 02 43 85 00 11.");
@@ -159,8 +196,6 @@ export default function ContactModal({
   const label = "text-[10px] font-semibold uppercase tracking-[0.2em] text-ink/45";
   const field =
     "w-full border-b border-line bg-transparent pb-2 pt-1 text-[15px] text-ink transition-colors placeholder:text-ink/30 focus:border-ink focus:outline-none";
-  const circle =
-    "flex h-11 w-11 items-center justify-center rounded-full border border-ink/25 text-[14px] transition-colors group-hover:border-ink group-hover:bg-ink group-hover:text-white";
 
   return createPortal(
     <div
@@ -217,32 +252,12 @@ export default function ContactModal({
           </div>
         </div>
 
-        {/* Corps : formulaire + rappel, séparés par un simple filet */}
+        {/* Corps : formulaire + rappel, séparés par un simple filet.
+            Au succès, la popup se ferme et le visiteur part sur /confirmation
+            (récapitulatif + téléchargement PDF) : il n'y a donc plus d'écran
+            de remerciement dans la popup elle-même. */}
         <div className="grid gap-10 px-6 py-7 md:grid-cols-[1.05fr_0.95fr] md:gap-14 md:px-10 md:py-8">
-          {status === "ok" ? (
-            <div className="md:col-span-2">
-              <p className={`${label} text-brand`}>Demande envoyée</p>
-              <p className="mt-4 max-w-2xl font-display text-[clamp(1.4rem,2.8vw,2.1rem)] font-black uppercase leading-[1.06] text-ink">
-                Merci, nous nous occupons de la suite.
-              </p>
-              <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-ink/60 md:text-base">
-                {configured
-                  ? `Votre configuration ${vehicule} est transmise à la concession. Nous vous recontactons très vite pour votre rendez-vous pendant les ventes privées.`
-                  : "Votre demande de créneau est transmise à la concession. Nous vous recontactons très vite pour confirmer votre horaire."}
-              </p>
-              <button
-                type="button"
-                onClick={onClose}
-                className="group mt-8 inline-flex items-center gap-4 text-[11px] font-bold uppercase tracking-[0.2em] text-ink"
-              >
-                Fermer
-                <span aria-hidden="true" className={circle}>
-                  →
-                </span>
-              </button>
-            </div>
-          ) : (
-            <>
+          <>
               <form className="grid gap-x-8 gap-y-5 sm:grid-cols-2" onSubmit={submit}>
                 {/* Champ piège anti-spam */}
                 <input
@@ -498,8 +513,7 @@ export default function ContactModal({
                   </>
                 )}
               </aside>
-            </>
-          )}
+          </>
         </div>
       </div>
     </div>,
