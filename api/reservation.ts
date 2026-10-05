@@ -2,8 +2,13 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { Resend } from "resend";
 
 /* Fonction serverless (Vercel : /api/reservation, dev : middleware Vite).
-   Envoie la demande de rendez-vous par mail via Resend.
-   Clés lues dans l'environnement : RESEND_API_KEY, MAIL_TO, MAIL_FROM. */
+   Envoie la demande de rendez-vous par mail via Resend :
+     1. la notification interne, vers MAIL_TO (optionnel : à défaut, l'adresse
+        portée par MAIL_FROM, donc la boîte du domaine vérifié) ;
+     2. l'accusé de réception au visiteur, à l'adresse qu'il a saisie.
+   MAIL_TO n'est donc jamais obligatoire : RESEND_API_KEY + un MAIL_FROM du
+   domaine vérifié suffisent, et le visiteur reçoit sa confirmation.
+   Clés lues dans l'environnement : RESEND_API_KEY, MAIL_FROM, MAIL_TO. */
 
 type Payload = {
   nom?: string;
@@ -19,6 +24,7 @@ type Payload = {
 };
 
 const LIMIT = 16_000;
+const LIEU = "Ventes privées BMW Ampère Autopassion, Le Mans · 13 & 14 novembre 2026";
 
 function send(res: ServerResponse, status: number, data: unknown) {
   res.statusCode = status;
@@ -50,6 +56,19 @@ const esc = (v: string) =>
 const clean = (v: unknown, max = 900) => String(v ?? "").trim().slice(0, max);
 
 const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+
+/** Liste d'adresses séparées par des virgules, les entrées invalides sont écartées. */
+const destinataires = (v: string | undefined) =>
+  (v ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => isEmail(s));
+
+/** Adresse nue d'un champ « Nom <adresse@domaine> » (valeur de MAIL_FROM). */
+const adresseNue = (v: string) => {
+  const m = v.match(/<([^>]+)>/);
+  return (m ? m[1] : v).trim().replace(/^["']|["']$/g, "");
+};
 
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
   if (req.method === "OPTIONS") {
@@ -99,15 +118,21 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     send(res, 500, { error: "RESEND_API_KEY absente : renseignez le fichier .env." });
     return;
   }
-  const to = (process.env.MAIL_TO ?? "")
-    .split(",")
-    .map((v) => v.trim())
-    .filter(Boolean);
-  if (!to.length) {
-    send(res, 500, { error: "MAIL_TO absente : renseignez le fichier .env." });
-    return;
-  }
-  const from = process.env.MAIL_FROM?.trim() || "Reservation <onboarding@resend.dev>";
+
+  const from =
+    process.env.MAIL_FROM?.trim().replace(/^["']|["']$/g, "") ||
+    "Ventes privées BMW Le Mans <onboarding@resend.dev>";
+
+  /* Boîte interne : MAIL_TO si renseignée, sinon l'adresse du domaine portée
+     par MAIL_FROM. Aucune configuration bloquante, la demande n'est jamais
+     perdue même sans MAIL_TO. */
+  const interne = destinataires(process.env.MAIL_TO);
+  const adresseDomaine = adresseNue(from);
+  const boiteInterne = interne.length
+    ? interne
+    : isEmail(adresseDomaine)
+      ? [adresseDomaine]
+      : [];
 
   const rows: [string, string][] = [
     ["Nom", nom],
@@ -119,30 +144,13 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     ["Configuration", configuration],
   ];
 
-  const details = rows
-    .filter(([, v]) => v !== "")
-    .map(([k, v]) => `${k} : ${v}`)
-    .join("\n");
+  const remplies = rows.filter(([, v]) => v !== "");
 
-  const text = [
-    "Nouvelle demande de créneau — Ventes privées BMW Ampère Autopassion (Le Mans)",
-    "",
-    details,
-    "",
-    message ? `Message :\n${message}` : "Message : —",
-    "",
-    "— Ventes privées BMW Ampère Autopassion, Le Mans · 13 & 14 novembre 2026",
-  ].join("\n");
+  const details = remplies.map(([k, v]) => `${k} : ${v}`).join("\n");
 
-  const html = `
-    <div style="font-family:Helvetica,Arial,sans-serif;color:#06213f;line-height:1.6">
-      <h2 style="margin:0 0 4px;font-size:18px">Nouvelle demande de créneau — ventes privées</h2>
-      <p style="margin:0 0 18px;font-size:13px;color:#5a6b80">
-        Ventes privées BMW · Ampère Autopassion, Le Mans · 13 &amp; 14 novembre 2026
-      </p>
+  const tableHtml = `
       <table cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:14px">
-        ${rows
-          .filter(([, v]) => v !== "")
+        ${remplies
           .map(
             ([k, v]) =>
               `<tr>
@@ -151,37 +159,120 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
                </tr>`,
           )
           .join("")}
-      </table>
+      </table>`;
+
+  const piedHtml = `
+      <p style="margin:24px 0 0;font-size:12px;color:#00559d">${esc(LIEU)}</p>`;
+
+  /* 1. Notification interne : c'est elle qui porte la demande. */
+  const sujetInterne = `Créneau ventes privées — ${vehicule || "véhicule à préciser"} · ${nom}`;
+  const textInterne = [
+    "Nouvelle demande de créneau — Ventes privées BMW Ampère Autopassion (Le Mans)",
+    "",
+    details,
+    "",
+    message ? `Message :\n${message}` : "Message : —",
+    "",
+    `— ${LIEU}`,
+  ].join("\n");
+  const htmlInterne = `
+    <div style="font-family:Helvetica,Arial,sans-serif;color:#06213f;line-height:1.6">
+      <h2 style="margin:0 0 4px;font-size:18px">Nouvelle demande de créneau — ventes privées</h2>
+      <p style="margin:0 0 18px;font-size:13px;color:#5a6b80">${esc(LIEU)}</p>
+      ${tableHtml}
       ${
         message
           ? `<p style="margin:18px 0 0;font-size:14px"><strong>Message</strong><br>${esc(message).replace(/\n/g, "<br>")}</p>`
           : ""
       }
-      <p style="margin:24px 0 0;font-size:12px;color:#00559d">
-        Ventes privées BMW Ampère Autopassion — Le Mans · 13 &amp; 14 novembre 2026
-      </p>
+      ${piedHtml}
       <p style="margin:24px 0 0;font-size:12px;color:#5a6b80">
         Répondre à ce mail écrit directement au client (${esc(email)}).
       </p>
     </div>`;
 
+  /* 2. Accusé de réception : le visiteur sait tout de suite que sa demande est
+     enregistrée. Envoyé après la notification interne, et sans la faire
+     échouer s'il est refusé (l'essentiel, la demande, est déjà arrivée). */
+  const sujetClient = "Votre demande de créneau — ventes privées BMW Le Mans";
+  const textClient = [
+    `${nom},`,
+    "",
+    "Nous avons reçu votre demande de créneau pour les ventes privées BMW Ampère Autopassion (Le Mans).",
+    "Un conseiller vous confirme votre horaire par email et par téléphone.",
+    "",
+    details,
+    "",
+    message ? `Votre message :\n${message}` : "",
+    "",
+    "Vous pouvez télécharger le récapitulatif de votre demande depuis la page de confirmation du site.",
+    "",
+    `— ${LIEU}`,
+  ]
+    .filter((l) => l !== "")
+    .join("\n");
+  const htmlClient = `
+    <div style="font-family:Helvetica,Arial,sans-serif;color:#06213f;line-height:1.6">
+      <h2 style="margin:0 0 4px;font-size:18px">Votre demande de créneau est enregistrée</h2>
+      <p style="margin:0 0 18px;font-size:13px;color:#5a6b80">
+        ${esc(nom)}, nous avons bien reçu votre demande pour les ventes privées BMW Ampère Autopassion.
+        Un conseiller vous confirme votre horaire par email et par téléphone.
+      </p>
+      ${tableHtml}
+      ${
+        message
+          ? `<p style="margin:18px 0 0;font-size:14px"><strong>Votre message</strong><br>${esc(message).replace(/\n/g, "<br>")}</p>`
+          : ""
+      }
+      <p style="margin:18px 0 0;font-size:13px;color:#5a6b80">
+        Le récapitulatif de votre demande reste téléchargeable depuis la page de confirmation du site.
+      </p>
+      ${piedHtml}
+    </div>`;
+
+  const resend = new Resend(apiKey);
+  const replyToInterne = email;
+  const replyToClient = boiteInterne[0] ?? adresseDomaine;
+
   try {
-    const { data, error } = await new Resend(apiKey).emails.send({
-      from,
-      to,
-      replyTo: email,
-      subject: `Créneau ventes privées — ${vehicule || "véhicule à préciser"} · ${nom}`,
-      text,
-      html,
-    });
-    if (error) {
-      send(res, 502, { error: error.message });
-      return;
+    /* Notification interne. Si aucune adresse interne n'est exploitable, on
+       enchaîne directement sur l'accusé au visiteur. */
+    let ref: string | null = null;
+    if (boiteInterne.length) {
+      const { data, error } = await resend.emails.send({
+        from,
+        to: boiteInterne,
+        replyTo: replyToInterne,
+        subject: sujetInterne,
+        text: textInterne,
+        html: htmlInterne,
+      });
+      if (error) {
+        send(res, 502, { error: error.message });
+        return;
+      }
+      /* L'identifiant d'envoi Resend devient la référence de suivi affichée au
+         visiteur (page de confirmation) : elle permet de retrouver la demande
+         dans la console d'envoi. */
+      ref = data?.id ?? null;
     }
-    /* L'identifiant d'envoi Resend devient la référence de suivi affichée au
-       visiteur (page de confirmation) : elle permet de retrouver la demande
-       dans la console d'envoi. */
-    send(res, 200, { ok: true, ref: data?.id ?? null });
+
+    let accuse = false;
+    const client = await resend.emails.send({
+      from,
+      to: [email],
+      replyTo: isEmail(replyToClient) ? replyToClient : undefined,
+      subject: sujetClient,
+      text: textClient,
+      html: htmlClient,
+    });
+    if (client.error) {
+      console.error("[/api/reservation] accusé client refusé :", client.error.message);
+    } else {
+      accuse = true;
+    }
+
+    send(res, 200, { ok: true, ref: ref ?? client.data?.id ?? null, accuse });
   } catch (e) {
     send(res, 502, { error: e instanceof Error ? e.message : "Envoi impossible." });
   }

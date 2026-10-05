@@ -83,20 +83,28 @@ seul bloc sombre. Les cartes se rangent en 2 colonnes à partir de `md`.
 ## Formulaire de rendez-vous (Resend)
 
 Le formulaire `#reservation` poste sur `/api/reservation`, qui envoie le mail
-via [Resend](https://resend.com).
+via [Resend](https://resend.com). Deux envois par demande :
+
+1. la notification interne, à l'adresse de `MAIL_TO` (ou, si `MAIL_TO` est vide,
+   à l'adresse portée par `MAIL_FROM`) ;
+2. l'accusé de réception au visiteur, à l'adresse qu'il a saisie.
+
+Le visiteur est donc prévenu immédiatement, et la demande n'est jamais perdue :
+`MAIL_TO` n'est plus obligatoire. Si l'accusé de réception est refusé, la demande
+interne reste acceptée (l'API renvoie `{ ok: true, accuse: false }`).
 
 1. Créer une clé API sur https://resend.com/api-keys
-2. Remplir `.env` (fichier non versionné, voir `.env.example`) :
+2. Vérifier le domaine d'envoi sur Resend, puis remplir `.env` (fichier non
+   versionné, voir `.env.example`) :
 
 | Variable         | Rôle                                                                 |
 | ---------------- | -------------------------------------------------------------------- |
 | `RESEND_API_KEY` | clé API Resend — **obligatoire**                                     |
-| `MAIL_TO`        | adresse(s) qui reçoit les demandes (virgules si plusieurs) — **obligatoire** |
-| `MAIL_FROM`      | expéditeur ; `onboarding@resend.dev` tant que le domaine n'est pas vérifié |
+| `MAIL_FROM`      | expéditeur, sur le domaine vérifié — **obligatoire**                 |
+| `MAIL_TO`        | adresse(s) qui reçoit les demandes (virgules si plusieurs) — facultatif |
 
-Sans domaine vérifié, Resend n'autorise l'envoi que vers l'adresse du compte.
-En production, vérifier le domaine de la concession et mettre `MAIL_FROM` sur
-une adresse de ce domaine.
+Sans domaine vérifié, Resend n'autorise l'envoi que vers l'adresse du compte :
+garder `MAIL_FROM` sur `onboarding@resend.dev` et `MAIL_TO` sur cette adresse.
 
 ## API
 
@@ -105,7 +113,7 @@ une adresse de ce domaine.
 
 - `POST /api/reservation` — corps JSON `{ nom, email, telephone, vehicule, date, creneau, message, configuration }`
 - nom + email valides obligatoires, champ piège `site` anti-spam
-- réponse `{ ok: true }` ou `{ error: "..." }`
+- réponse `{ ok: true, ref, accuse }` ou `{ error: "..." }`
 
 `vercel.json` réécrit toutes les URLs (hors `/api/`) vers `index.html` pour que
 les routes du client fonctionnent au rechargement.
